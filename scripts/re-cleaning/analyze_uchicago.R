@@ -2,6 +2,7 @@
 library(tidyverse)
 library(janitor)
 library(extrafont)
+library(readxl)
 
 rm(list = ls())
 
@@ -41,16 +42,32 @@ data = read_csv("data/ipeds/cleaned/major_numbers.csv") %>%
     total_degrees = sum(total)
   )
 
+
+change = data %>%
+  group_by(year, cip_code, classification) %>%
+  summarise(
+    share_students = sum(total) / first(total_students)
+  ) %>%
+  filter(
+    year %in% c(2005, 2024),
+    classification %in% c("Humanities", "Fine & Performing Arts")
+    ) %>%
+  pivot_wider(names_from = year, values_from = share_students) %>%
+  mutate(
+    change = `2024` - `2005`
+  )
+  
+
 uchicago_econ_2024 = 0.41
 
 humanities_econ = data %>%
   filter(
     (
       (classification == "Humanities" | classification == "Fine & Performing Arts") 
-           & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
-                                        "English Language and Literature", "General Humanities/Liberal Studies",
-                                        "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
-                                        "Study of the Arts", "Cultural, Ethnic, and Gender Studies")
+           # & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
+           #                              "English Language and Literature", "General Humanities/Liberal Studies",
+           #                              "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
+           #                              "Study of the Arts", "Cultural, Ethnic, and Gender Studies")
           )
          | grepl("economics", cip_code, ignore.case = TRUE)) %>%
   mutate(
@@ -83,7 +100,7 @@ ggplot(humanities_econ, aes(x = year, y = share_students, color = classification
   theme_custom() +
   ylim(0.1, 0.45) +
   theme(
-    legend.position = c(0.3, 0.8),
+    legend.position = c(0.3, 0.85),
     legend.text = element_text(size = 16)
   )
 ggsave("output/uchicago/per_student/economics_humanities.png", width = 8, height = 5)
