@@ -247,6 +247,7 @@ plot_major_trend("Political Science and Government, General", "Political science
 ggsave("output/uchicago/per_student/polisci_trend.png", width = 7.5, height = 4)
 
 
+
 substitution =data %>%
   filter(
     classification == "Humanities" | classification == "Fine & Performing Arts"
@@ -350,10 +351,78 @@ ggsave("output/uchicago/per_student/substitution_trend.png", width = 8, height =
   
   
   
+ss_select = data %>%
+  filter(
+    cip_code %in% c("Anthropology, General", "Political Science and Government, General")
+  ) %>%
+  mutate(
+    cip_code = case_when(
+      cip_code == "Anthropology, General" ~ "Anthropology",
+      cip_code == "Political Science and Government, General" ~ "Political Science"
+    ),
+    cip_code = factor(cip_code, levels = c("Political Science", "Anthropology"))
+  ) %>%
+  group_by(cip_code, year) %>%
+  summarise(
+    share_students = sum(total) / first(total_students)
+  )
+ggplot(ss_select, aes(x = year, y = share_students, color = cip_code)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = NULL,
+    y = "Share of students",
+    title = "Select social science majors at Chicago",
+    color = NULL
+  ) +
+  scale_x_continuous(breaks = seq(2005, 2025, 3)) +
+  theme_custom() +
+  scale_color_manual(values = c(
+    "Anthropology" = "#1b9e77",
+    "Political Science" = "#d95f02"
+  )) +
+  theme(
+    legend.position = c(0.8, 0.85),
+    legend.text = element_text(size = 12)
+  )
+ggsave("output/uchicago/per_student/ss_select_trend.png", width = 7.5, height = 4)  
   
   
-  
-  
-  
-  
+phil_history = data %>%
+  filter(
+    cip_code %in% c("History, General", "Philosophy")
+  ) %>%
+  mutate(
+    cip_code = case_when(
+      cip_code == "History, General" ~ "History",
+      cip_code == "Philosophy" ~ "Philosophy"
+    ),
+    cip_code = factor(cip_code, levels = c("History", "Philosophy"))
+  ) %>%
+  group_by(cip_code, year) %>%
+  summarise(
+    share_students = sum(total) / first(total_students)
+  )
+ggplot(phil_history, aes(x = year, y = share_students, color = cip_code, shape = cip_code)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = NULL,
+    y = "Share of students",
+    title = "Select social science majors at Chicago",
+    color = NULL,
+    shape = NULL
+  ) +
+  scale_x_continuous(breaks = seq(2005, 2025, 3)) +
+  theme_custom() +
+  scale_color_manual(values = c(
+    "Philosophy" = "#0076bd",
+    "History" = "#7bb14e"
+  )) +
+  theme(
+    legend.position = c(0.8, 0.85),
+    legend.text = element_text(size = 12)
+  )
+ggsave("output/uchicago/per_student/phil_history.png", width = 7.5, height = 4)  
 
+  
