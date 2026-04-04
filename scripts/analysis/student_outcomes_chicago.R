@@ -2,6 +2,7 @@
 library(tidyverse)
 library(janitor)
 library(extrafont)
+library(readxl)
 
 rm(list = ls())
 
@@ -26,9 +27,9 @@ theme_custom <- function(base_size = 17, base_family = "Georgia") {
 
 loadfonts(device = "pdf")
 
-setwd("/Users/arijacob/Documents/Maroon Article")
+setwd("/Users/arijacob/Documents/GitHub/chicago_majors")
 
-data = read_xlsx("Data/student_outcomes.xlsx") %>%
+data = read_xlsx("data/chicago_specific/student_outcomes.xlsx") %>%
   clean_names() %>%
   mutate(
     industry = trimws(industry),
@@ -71,7 +72,7 @@ ggplot(finance_business_data, aes(x = year, y = share)) +
   labs(
     x = NULL,
     y = "Percent of employed graduates",
-    subtitle = "Graduates in Finance and Business Industries"
+    subtitle = "No change in finance and business industries post 2018"
   ) +
   scale_y_continuous(
     limits = c(10, 40),
@@ -82,7 +83,7 @@ ggplot(finance_business_data, aes(x = year, y = share)) +
   theme(
     axis.text.x = element_text(angle = 45, hjust = 1)
   )
-ggsave("Figures/uchicago/outcomes/finance_business.png", width = 10, height = 6)
+ggsave("output/uchicago/outcomes/finance_business.png", width = 8, height = 4)
 
 
 consulting = data %>%

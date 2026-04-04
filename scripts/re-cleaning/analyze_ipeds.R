@@ -2,6 +2,7 @@
 library(tidyverse)
 library(janitor)
 library(extrafont)
+library(readxl)
 
 rm(list = ls())
 
@@ -45,8 +46,11 @@ data = read_csv("data/ipeds/cleaned/major_numbers.csv") %>%
 uchicago_econ_2024 = 0.41
 
 share_humanities = data %>%
-  filter(classification == "Humanities" | classification == "Fine & Performing Arts"
-        #  | str_sub(cipcode, 1, 2) == "50"
+  filter((classification == "Humanities" | classification == "Fine & Performing Arts")
+         & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
+                                      "English Language and Literature", "General Humanities/Liberal Studies",
+                                      "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
+                                      "Study of the Arts")
          ) %>%
   group_by(instnm, year, classification) %>%
   summarise(
@@ -55,10 +59,10 @@ share_humanities = data %>%
     total_students = first(total_students)
   ) %>%
   mutate(
-    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy-Plus")
+    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy Plus")
   ) %>%
   mutate(
-    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy-Plus"))
+    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
   ) %>%
   group_by(is_uchicago, year) %>%
   summarise(
@@ -77,12 +81,12 @@ share_humanities %>%
     title  = "Humanities and Arts",
     color = NULL
   ) +
-  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy-Plus" = "#737373")) +
+  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
-  ylim(0.05, 0.2) +
+  #ylim(0.05, 0.2) +
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
-ggsave("output/ivyplus/per_student/share_humanities_arts.png", width = 10, height = 6)
+ggsave("output/ivyplus/per_student/share_humanities_arts.png", width = 7.5, height = 4)
 
 share_econ = data %>%
   filter(grepl("economics", cip_code, ignore.case = T) | classification == "Business & Management") %>%
@@ -93,16 +97,23 @@ share_econ = data %>%
     total_students = first(total_students)
   ) %>%
   mutate(
-    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy-Plus")
-  ) %>%
-  mutate(
-    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy-Plus"))
+    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy Plus")
   ) %>%
   group_by(is_uchicago, year) %>%
   summarise(
     share_students = weighted.mean(share_students, total_students)
   ) %>%
-  drop_na()
+  drop_na() %>%
+  bind_rows(
+    tibble(
+      is_uchicago = "University of Chicago",
+      year = 2025,
+      share_students = uchicago_econ_2024
+    )
+  ) %>%
+  mutate(
+    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
+  )
 
 share_econ %>%
   ggplot(aes(x = year, y = share_students, color = factor(is_uchicago)))+
@@ -112,14 +123,14 @@ share_econ %>%
   labs(
     x = NULL,
     y = "Share of students",
-    title  = "Econ and Business Majors",
+    title  = "Economics and Business Majors",
     color = NULL
   ) +
-  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy-Plus" = "#737373")) +
+  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
-  theme(legend.position = c(0.7, 0.85),
+  theme(legend.position = c(0.3, 0.86),
         legend.text = element_text(size = 16))
-ggsave("output/ivyplus/per_student/share_econ_business.png", width = 10, height = 6)
+ggsave("output/ivyplus/per_student/share_econ_business.png", width = 7.5, height = 4)
 
 
 social_sciences_cip = c(42, 45, 44, 22, 5, 30.05, 30.23, 30.17, 30.28)
@@ -138,10 +149,10 @@ share_ss = data %>%
     total_awards = first(total_degrees)
   ) %>%
   mutate(
-    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy-Plus")
+    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy Plus")
   ) %>%
   mutate(
-    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy-Plus"))
+    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
   ) %>%
   group_by(is_uchicago, year) %>%
   summarise(
@@ -150,25 +161,31 @@ share_ss = data %>%
   drop_na()
 
 share_ss %>%
-  ggplot(aes(x = year, y = share_students, color = factor(is_uchicago)))+
+  ggplot(aes(x = year, y = share_students, color = factor(is_uchicago), shape = is_uchicago))+
   geom_point() +
   geom_line() +
   scale_color_brewer(palette = "Set2") +
   labs(
     x = NULL,
-    y = "Share of degrees",
-    title  = "Other social sciences",
-    color = NULL
+    y = "Share of students",
+    title  = "Other social science majors",
+    color = NULL,
+    shape = NULL
   ) +
-  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy-Plus" = "#737373")) +
+  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
-  ylim(0.15, 0.375) +
-  theme(legend.position = c(0.7, 0.85),
-        legend.text = element_text(size = 16))
-ggsave("output/ivyplus/per_student/share_social_sciences.png", width = 10, height = 6)
+  ylim(0.15, 0.4) +
+  theme(legend.position = c(0.8, 0.9),
+        legend.text = element_text(size = 13))
+ggsave("output/ivyplus/per_student/share_social_sciences.png", width = 7.5, height = 4)
 
 share_humanities_degrees = data %>%
-  filter(classification == "Humanities" | classification == "Fine & Performing Arts"
+  filter(
+    (classification == "Humanities" | classification == "Fine & Performing Arts")
+    & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
+                                   "English Language and Literature", "General Humanities/Liberal Studies",
+                                   "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
+                                   "Study of the Arts")
   ) %>%
   group_by(instnm, year, classification) %>%
   summarise(
@@ -176,10 +193,10 @@ share_humanities_degrees = data %>%
     total_degrees = first(total_degrees)
   ) %>%
   mutate(
-    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy-Plus")
+    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy Plus")
   ) %>%
   mutate(
-    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy-Plus"))
+    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
   ) %>%
   group_by(is_uchicago, year) %>%
   summarise(
@@ -195,15 +212,15 @@ share_humanities_degrees %>%
   labs(
     x = NULL,
     y = "Share of degrees",
-    title  = "Humanities and Arts",
+    title  = "Humanities and Arts Majors",
     color = NULL
   ) +
-  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy-Plus" = "#737373")) +
+  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
-  ylim(0.05, 0.2) +
+  ylim(0.05, 0.25) +
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
-ggsave("output/ivyplus/per_degree/share_humanities_arts.png", width = 10, height = 6)
+ggsave("output/ivyplus/per_degree/share_humanities_arts.png", width = 7.5, height = 4)
 
 share_ss_degrees = data %>%
   mutate(
@@ -220,10 +237,10 @@ share_ss_degrees = data %>%
     total_degrees = first(total_degrees)
   ) %>%
   mutate(
-    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy-Plus")
+    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy Plus")
   ) %>%
   mutate(
-    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy-Plus"))
+    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
   ) %>%
   group_by(is_uchicago, year) %>%
   summarise(
@@ -239,15 +256,15 @@ share_ss_degrees %>%
   labs(
     x = NULL,
     y = "Share of degrees",
-    title  = "Other social sciences",
+    title  = "Other Social Science Majors",
     color = NULL
   ) +
-  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy-Plus" = "#737373")) +
+  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
   ylim(0.15, 0.375) +
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
-ggsave("output/ivyplus/per_degree/share_social_sciences.png", width = 10, height = 6)
+ggsave("output/ivyplus/per_degree/share_social_sciences.png", width = 7.5, height = 4)
 
 wharton_uchicago = data %>%
   filter(
@@ -282,7 +299,7 @@ ggplot(wharton_uchicago, aes(x = year, y = share_students, color = instnm, shape
   labs(
     x = NULL,
     y = "Share of students",
-    title  = "Graduating business and economics majors",
+    title  = "Business and economics majors",
     color = NULL,
     shape = NULL
   ) +
@@ -295,6 +312,6 @@ ggplot(wharton_uchicago, aes(x = year, y = share_students, color = instnm, shape
   theme_custom() +
   theme(legend.position = c(0.3, 0.5),
         legend.text = element_text(size = 10))
-ggsave("output/ivyplus/per_student/wharton_uchicago.png", width = 8, height = 4)
+ggsave("output/ivyplus/per_student/wharton_uchicago.png", width = 7.5, height = 4)
 
 

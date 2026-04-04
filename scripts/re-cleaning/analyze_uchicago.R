@@ -64,10 +64,10 @@ humanities_econ = data %>%
   filter(
     (
       (classification == "Humanities" | classification == "Fine & Performing Arts") 
-           # & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
-           #                              "English Language and Literature", "General Humanities/Liberal Studies",
-           #                              "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
-           #                              "Study of the Arts", "Cultural, Ethnic, and Gender Studies")
+           & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
+                                        "English Language and Literature", "General Humanities/Liberal Studies",
+                                        "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
+                                        "Study of the Arts")
           )
          | grepl("economics", cip_code, ignore.case = TRUE)) %>%
   mutate(
@@ -100,7 +100,7 @@ ggplot(humanities_econ, aes(x = year, y = share_students, color = classification
   theme_custom() +
   ylim(0.1, 0.45) +
   theme(
-    legend.position = c(0.3, 0.85),
+    legend.position = c(0.3, 0.72),
     legend.text = element_text(size = 16)
   )
 ggsave("output/uchicago/per_student/economics_humanities.png", width = 8, height = 5)
@@ -128,7 +128,7 @@ lm(share_students ~ year, data = uchicago_economics %>% filter(year < 2018))
 ggplot(uchicago_economics, aes(x = year, y = share_students)) +
   geom_vline(xintercept = 2018, linetype = "dashed", color = "grey") +
   
-  annotate("text", x = 2010.5, y = 0.425,
+  annotate("text", x = 2011, y = 0.425,
            label = "Business Economics created",
            hjust = 0, vjust = -0.5, size = 4, family = "Georgia") +
   
@@ -180,14 +180,15 @@ english_history_students = data %>%
     share_students = sum(total) / first(total_students),
   )
 
-ggplot(english_history_students, aes(x = year, y = share_students, color = classification)) +
+ggplot(english_history_students, aes(x = year, y = share_students, color = classification, shape = classification)) +
   geom_line() +
   geom_point() +
   labs(
     x = NULL,
     y = "Share of students",
-    title = "English and history majors at Chicago",
-    color = NULL
+    title = "Humanities majors at Chicago",
+    color = NULL,
+    shape = NULL
   ) +
   scale_color_manual(values = c("English" = "#7bb14e", "History" = "#0076bd")) +
   scale_x_continuous(breaks = seq(2005, 2025, 3)) +
@@ -207,6 +208,53 @@ philosphy_students = data %>%
     share_students = sum(total) / first(total_students)
   )
 
+
+english_polysci_students = data %>%
+  filter(
+    cip_code == "English Language and Literature, General"
+    | cip_code == "Political Science and Government, General"
+  ) %>%
+  mutate(
+    classification = case_when(
+      cip_code == "English Language and Literature, General" ~ "English",
+      cip_code == "Political Science and Government, General" ~ "Political Science",
+    )
+  ) %>%
+  group_by(year, classification) %>%
+  summarise(
+    share_students = sum(total) / first(total_students),
+  ) %>%
+  mutate(
+    classification = factor(classification, levels = c("Political Science", "English"))
+  )
+
+ggplot(english_polysci_students, aes(x = year, y = share_students, color = classification, shape = classification)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = NULL,
+    y = "Share of students",
+    title = "Shrinking humanities and social sciences",
+    color = NULL,
+    shape = NULL
+  ) +
+  scale_color_manual(values = c("English" = "#7bb14e", "Political Science" = "#0076bd")) +
+  scale_x_continuous(breaks = seq(2005, 2025, 3)) +
+  theme_custom() +
+  theme(
+    legend.position = c(0.8, 0.8),
+    legend.text = element_text(size = 16)
+  )
+ggsave("output/uchicago/per_student/english_polisci_trend.png", width = 7.5, height = 4)
+
+philosphy_students = data %>%
+  filter(
+    cip_code == "Philosophy"
+  ) %>%
+  group_by(year) %>%
+  summarise(
+    share_students = sum(total) / first(total_students)
+  )
 ggplot(philosphy_students, aes(x = year, y = share_students)) +
   geom_line() +
   geom_point() +
@@ -250,8 +298,12 @@ ggsave("output/uchicago/per_student/polisci_trend.png", width = 7.5, height = 4)
 
 substitution =data %>%
   filter(
-    classification == "Humanities" | classification == "Fine & Performing Arts"
-  | grepl("economics", cip_code, ignore.case = TRUE)
+    (classification == "Humanities" | classification == "Fine & Performing Arts"
+    & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
+                                   "English Language and Literature", "General Humanities/Liberal Studies",
+                                   "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
+                                   "Study of the Arts"))
+ # | grepl("economics", cip_code, ignore.case = TRUE)
   | cip_code == "Public Policy Analysis, General"
   | cip_code %in% c("Mathematics, General", "Statistics, General")
   ) %>%
@@ -268,13 +320,35 @@ substitution =data %>%
     share_students = sum(total) / first(total_students),
   ) 
 
-ggplot(substitution, aes(x = year, y = share_students, color = classification)) +
+ggplot(substitution, aes(x = year, y = share_students, color = classification, shape = classification)) +
+  geom_vline(xintercept = 2018, linetype = "dashed", color = "grey85") +
+  annotate("text", x = 2014, y = 0.375, label = "Business economics created", size = 4, family = "Georgia") +
+  annotate("text", x = 2008, y = 0.26, label = "Humanities and Art", size = 5, family = "Georgia") +
+  annotate("segment",
+           x = 2008, xend = 2010,
+           y = 0.275, yend = 0.31,
+           arrow = arrow(length = unit(0.2, "cm")),
+           color = "grey85") +
+  annotate("text", x = 2008.25, y = 0.135, label = "Math and Stats", size = 5, family = "Georgia") +
+  annotate("segment",
+           x = 2010.6, xend = 2012,
+           y = 0.125, yend = 0.1,
+           arrow = arrow(length = unit(0.2, "cm")),
+           color = "grey85") +
+  annotate("text", x = 2021, y = 0.025, label = "Public Policy", size = 5, family = "Georgia") +
+  annotate("segment",
+           x = 2019.25, xend = 2018.5,
+           y = 0.0375, yend = 0.085,
+           arrow = arrow(length = unit(0.2, "cm")),
+           color = "grey85") +
   geom_line() +
   geom_point() +
   labs(
+    title = "Substitution in response to business economics",
     x = NULL,
     y = "Share of students",
-    color = NULL
+    color = NULL,
+    shape = NULL
   ) +
   scale_color_manual(values = c(
     "Humanities and Art" = "#7bb14e",
@@ -283,8 +357,12 @@ ggplot(substitution, aes(x = year, y = share_students, color = classification)) 
     "Math and Stats" = "#1b9e77"
   )) +
   scale_x_continuous(breaks = seq(2005, 2025, 3)) +
-  theme_custom()
-
+  ylim(0, 0.4) +
+  theme_custom() +
+  theme(
+    legend.position = "none"
+  )
+ggsave("output/uchicago/per_student/substitution_trend.png", width = 7.5, height = 4)
 
 post_bizecon_change = data %>%
   group_by(year, cip_code) %>%
@@ -366,14 +444,15 @@ ss_select = data %>%
   summarise(
     share_students = sum(total) / first(total_students)
   )
-ggplot(ss_select, aes(x = year, y = share_students, color = cip_code)) +
+ggplot(ss_select, aes(x = year, y = share_students, color = cip_code, shape = cip_code)) +
   geom_line() +
   geom_point() +
   labs(
     x = NULL,
     y = "Share of students",
-    title = "Select social science majors at Chicago",
-    color = NULL
+    title = "Shrinking social science majors",
+    color = NULL,
+    shape = NULL
   ) +
   scale_x_continuous(breaks = seq(2005, 2025, 3)) +
   theme_custom() +
@@ -409,7 +488,7 @@ ggplot(phil_history, aes(x = year, y = share_students, color = cip_code, shape =
   labs(
     x = NULL,
     y = "Share of students",
-    title = "Select social science majors at Chicago",
+    title = "Philsophy and history majors are stable",
     color = NULL,
     shape = NULL
   ) +
@@ -424,5 +503,3 @@ ggplot(phil_history, aes(x = year, y = share_students, color = cip_code, shape =
     legend.text = element_text(size = 12)
   )
 ggsave("output/uchicago/per_student/phil_history.png", width = 7.5, height = 4)  
-
-  
