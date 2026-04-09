@@ -119,3 +119,20 @@ completitions_final = major_numbers_data %>%
   select(-award_level)
 
 write_csv(completitions_final, "data/ipeds/cleaned/major_numbers.csv")
+
+classifications = read_xlsx("data/classifications/Degree_Program_Code_Catalog.xlsx", sheet = 2, skip = 3) %>%
+  clean_names() %>%
+  select(code, cip_code, humanities_discipline, classification = bachelors)
+
+data = read_csv("data/ipeds/cleaned/major_numbers.csv") %>%
+  left_join(classifications, by = c("cipcode" = "code")) %>%
+  group_by(instnm, year) %>%
+  mutate(
+    total_students = sum(total[major_number == 1]),
+    total_degrees = sum(total)
+  ) %>%
+  select(
+    -school_id
+  )
+
+write_csv(data, "data/ipeds/cleaned/major_numbers_with_classification.csv")
