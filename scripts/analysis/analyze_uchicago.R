@@ -104,6 +104,8 @@ ggplot(humanities_econ, aes(x = year, y = share_students, color = classification
     legend.text = element_text(size = 16)
   )
 ggsave("output/uchicago/per_student/economics_humanities.png", width = 8, height = 5)
+write_csv(humanities_econ, "output/uchicago/per_student/economics_humanities.csv")
+
 
 uchicago_economics = data %>%
   filter(grepl("economics", cip_code, ignore.case = T)) %>%
@@ -198,6 +200,8 @@ ggplot(english_history_students, aes(x = year, y = share_students, color = class
     legend.text = element_text(size = 16)
   )
 ggsave("output/uchicago/per_student/english_history_trend.png", width = 7.5, height = 4)
+write_csv(english_history_students, "output/uchicago/per_student/english_history_trend.csv")
+
 
 philosphy_students = data %>%
   filter(
@@ -246,6 +250,8 @@ ggplot(english_polysci_students, aes(x = year, y = share_students, color = class
     legend.text = element_text(size = 16)
   )
 ggsave("output/uchicago/per_student/english_polisci_trend.png", width = 7.5, height = 4)
+write_csv(english_polysci_students, "output/uchicago/per_student/english_polisci_trend.csv")
+
 
 philosphy_students = data %>%
   filter(
@@ -267,6 +273,8 @@ ggplot(philosphy_students, aes(x = year, y = share_students)) +
   ylim(0.01, 0.07) +
   theme_custom()
 ggsave("output/uchicago/per_student/philosophy_trend.png", width = 7.5, height = 4)
+write_csv(philosphy_students, "output/uchicago/per_student/philosophy_trend.csv")
+
 
 
 plot_major_trend = function(cip_code, title) {
@@ -296,7 +304,7 @@ ggsave("output/uchicago/per_student/polisci_trend.png", width = 7.5, height = 4)
 
 
 
-substitution =data %>%
+substitution = data %>%
   filter(
     (classification == "Humanities" | classification == "Fine & Performing Arts"
     & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
@@ -363,6 +371,8 @@ ggplot(substitution, aes(x = year, y = share_students, color = classification, s
     legend.position = "none"
   )
 ggsave("output/uchicago/per_student/substitution_trend.png", width = 7.5, height = 4)
+write_csv(substitution, "output/uchicago/per_student/substitution_trend.csv")
+
 
 post_bizecon_change = data %>%
   group_by(year, cip_code) %>%
@@ -426,7 +436,7 @@ ggplot(substitution, aes(x = year, y = share_students,
     legend.text = element_text(size = 15)
   )
 ggsave("output/uchicago/per_student/substitution_trend.png", width = 8, height = 5)  
-  
+
   
   
 ss_select = data %>%
@@ -444,6 +454,7 @@ ss_select = data %>%
   summarise(
     share_students = sum(total) / first(total_students)
   )
+
 ggplot(ss_select, aes(x = year, y = share_students, color = cip_code, shape = cip_code)) +
   geom_line() +
   geom_point() +
@@ -465,7 +476,7 @@ ggplot(ss_select, aes(x = year, y = share_students, color = cip_code, shape = ci
     legend.text = element_text(size = 12)
   )
 ggsave("output/uchicago/per_student/ss_select_trend.png", width = 7.5, height = 4)  
-  
+write_csv(ss_select, "output/uchicago/per_student/ss_select_trend.csv")
   
 phil_history = data %>%
   filter(
@@ -482,6 +493,7 @@ phil_history = data %>%
   summarise(
     share_students = sum(total) / first(total_students)
   )
+
 ggplot(phil_history, aes(x = year, y = share_students, color = cip_code, shape = cip_code)) +
   geom_line() +
   geom_point() +
@@ -503,3 +515,4 @@ ggplot(phil_history, aes(x = year, y = share_students, color = cip_code, shape =
     legend.text = element_text(size = 12)
   )
 ggsave("output/uchicago/per_student/phil_history.png", width = 7.5, height = 4)  
+write_csv(phil_history, "output/uchicago/per_student/phil_history_trend.csv")

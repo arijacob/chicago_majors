@@ -87,6 +87,8 @@ share_humanities %>%
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
 ggsave("output/ivyplus/per_student/share_humanities_arts.png", width = 7.5, height = 4)
+write_csv(share_humanities, "output/ivyplus/per_student/share_humanities_arts.csv")
+
 
 share_econ = data %>%
   filter(grepl("economics", cip_code, ignore.case = T) | classification == "Business & Management") %>%
@@ -115,8 +117,7 @@ share_econ = data %>%
     is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
   )
 
-share_econ %>%
-  ggplot(aes(x = year, y = share_students, color = factor(is_uchicago)))+
+ggplot(share_econ, aes(x = year, y = share_students, color = factor(is_uchicago)))+
   geom_point() +
   geom_line() +
   scale_color_brewer(palette = "Set2") +
@@ -131,7 +132,7 @@ share_econ %>%
   theme(legend.position = c(0.3, 0.86),
         legend.text = element_text(size = 16))
 ggsave("output/ivyplus/per_student/share_econ_business.png", width = 7.5, height = 4)
-
+write_csv(share_econ, "output/ivyplus/per_student/share_econ_business.csv")
 
 social_sciences_cip = c(42, 45, 44, 22, 5, 30.05, 30.23, 30.17, 30.28)
 
@@ -160,8 +161,7 @@ share_ss = data %>%
   ) %>%
   drop_na()
 
-share_ss %>%
-  ggplot(aes(x = year, y = share_students, color = factor(is_uchicago), shape = is_uchicago))+
+ggplot(share_ss, aes(x = year, y = share_students, color = factor(is_uchicago), shape = is_uchicago))+
   geom_point() +
   geom_line() +
   scale_color_brewer(palette = "Set2") +
@@ -178,6 +178,8 @@ share_ss %>%
   theme(legend.position = c(0.8, 0.9),
         legend.text = element_text(size = 13))
 ggsave("output/ivyplus/per_student/share_social_sciences.png", width = 7.5, height = 4)
+write_csv(share_ss, "output/ivyplus/per_student/share_social_sciences.csv")
+
 
 share_humanities_degrees = data %>%
   filter(
@@ -204,8 +206,7 @@ share_humanities_degrees = data %>%
   ) %>%
   drop_na()
 
-share_humanities_degrees %>%
-  ggplot(aes(x = year, y = share_degrees, color = factor(is_uchicago)))+
+ggplot(share_humanities_degrees, aes(x = year, y = share_degrees, color = factor(is_uchicago)))+
   geom_point() +
   geom_line() +
   scale_color_brewer(palette = "Set2") +
@@ -221,6 +222,8 @@ share_humanities_degrees %>%
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
 ggsave("output/ivyplus/per_degree/share_humanities_arts.png", width = 7.5, height = 4)
+write_csv(share_humanities_degrees, "output/ivyplus/per_degree/share_humanities_arts.csv")
+
 
 share_ss_degrees = data %>%
   mutate(
@@ -248,8 +251,7 @@ share_ss_degrees = data %>%
   ) %>%
   drop_na()
 
-share_ss_degrees %>%
-  ggplot(aes(x = year, y = share_degrees, color = factor(is_uchicago)))+
+ggplot(share_ss_degrees, aes(x = year, y = share_degrees, color = factor(is_uchicago)))+
   geom_point() +
   geom_line() +
   scale_color_brewer(palette = "Set2") +
@@ -265,6 +267,8 @@ share_ss_degrees %>%
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
 ggsave("output/ivyplus/per_degree/share_social_sciences.png", width = 7.5, height = 4)
+write_csv(share_ss_degrees, "output/ivyplus/per_degree/share_social_sciences.csv")
+
 
 wharton_uchicago = data %>%
   filter(
@@ -313,5 +317,5 @@ ggplot(wharton_uchicago, aes(x = year, y = share_students, color = instnm, shape
   theme(legend.position = c(0.3, 0.5),
         legend.text = element_text(size = 10))
 ggsave("output/ivyplus/per_student/wharton_uchicago.png", width = 7.5, height = 4)
-
+write_csv(wharton_uchicago, "output/ivyplus/per_student/wharton_uchicago.csv")
 
