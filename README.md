@@ -4,7 +4,7 @@ This is a repository for the Maroon article on major composition at UChicago and
 ## Data
 See the data folder for data. There are three sub folders 
 1. `data/chicago_specific` which contains the 2024-2025 convocation program, data on changes in program requirements, enrollment numbers for intro econ classes, and student outcome data.
-2. `data/classifications` which contains the National Academy of Arts and Sciences classification of cip codes as well as a manual classification
+2. `data/classifications` which contains the National Academy of Arts and Sciences classification of cip codes as well as the classification I use for analysis `data/classifications/final_classifications.xlsx`.
 3. `data/ipeds` which contains raw and cleaned IPEDS completion files.
 
 ## Scripts
