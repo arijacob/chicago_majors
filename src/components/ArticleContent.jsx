@@ -1,34 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { AnimationBoxOne, AnimationBoxTwo, ScrollContainer } from "./Interactives.jsx"
+import {  ScrollContainer, IntroAnimation } from "./Interactives.jsx"
 import { sections } from '../../public/content.js';
 
-
-const IntroAnimation = ({
-    scrollY,
-    section,
-    onStepEnter,
-    onStepExit,
-    height
-}) => {
-    return (
-        <div className="h-[500vh] w-screen">
-            <div className="sticky top-0 h-screen flex justify-center items-center">
-                <div className="w-full max-w-xl">
-                    <h1 className="text-2xl font-bold text-center w-full">
-                        {section.scrollText[0]}
-                    </h1>
-                </div>
-            </div>
-            <ScrollContainer
-                onStepEnter={onStepEnter}
-                onStepExit={onStepExit}
-                textArray={section.scrollText}
-                start={section.start}
-                height={height}
-            />
-        </div>
-    )
-}
 
 export default function ArticleContent({ windowHeight, windowWidth }) {
     const spacing = .5;
@@ -89,47 +62,7 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
 
     return (
         <div className="[overflow-x:clip]">
-            <AnimationBoxOne
-                currentStepIndex={currentStepIndex}
-                scrollText={sections[0].scrollText}
-                paragraphText={sections[0].paragraphText}
-                windowWidth={windowWidth}
-                imageArray={sections[0].imageArray}
-                onStepEnter={onStepEnter}
-                onStepExit={onStepExit}
-                barLength={sections[0].barLength}
-                barStart={sections[0].barStart}
-                height={windowHeight}
-                start={sections[0].start}
-                width={windowWidth}
-            />
-            <p className="content mt-10 mb-10">
-                {sections[0].paragraphText[0]}
-            </p>
-            { sections.slice(1, 4).map((section, index) => (
-                <div key={index}>
-                    <AnimationBoxTwo
-                        currentStepIndex={currentStepIndex}
-                        scrollText={section.scrollText}
-                        paragraphText={section.paragraphText}
-                        windowWidth={windowWidth}
-                        imageArray={section.imageArray}
-                        barLength={section.barLength}
-                        barStart={section.barStart}
-                        onStepEnter={onStepEnter}
-                        onStepExit={onStepExit}
-                        height={windowHeight}
-                        size={section.size}
-                        start={section.start}
-                        width={windowWidth}
-                    />
-                    { section.paragraphText.map((paragraph, index) => (
-                        <p className="content mt-10 mb-10" key={index}>
-                            {paragraph}
-                        </p>
-                    ))}
-                </div>
-            ))}
+            <IntroAnimation />
         </div>
     );
 }

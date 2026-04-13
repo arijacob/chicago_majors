@@ -59,8 +59,8 @@ const Subhead = ({ windowWidth }) => {
         >
             <h1
                 className="text-lg sm:text-2xl text-[black] sm:text-white"
+                dangerouslySetInnerHTML={{ __html: subhead }}
             >
-                {subhead}
             </h1>
         </div>
     );
@@ -114,11 +114,11 @@ const Header = ({ windowWidth, windowHeight }) => {
     return (
         <div className="w-full h-[100vh] relative">
             <CoverImage />
-            <p className="text-right mr-3 md:mr-5 text-sm z-[6] 
-            sm:hidden relative top-[50vh]">
-            One of the many jam circles that formed during the workshop.{' '}
+            {/* <p className="text-right mr-3 md:mr-5 text-sm z-[6] 
+            sm:hidden relative top-[50vh]"> */}
+            {/* One of the many jam circles that formed during the workshop.{' '} */}
             <a href="https://chicagomaroon.com/staff_name/nolan-shaffer/">Nolan Shaffer</a>.
-            </p>
+            {/* </p> */}
             <div className="w-full h-[50vh] sm:h-[100vh] absolute bg-gray-500
             opacity-20 top-0 z-[0]">
             </div>
@@ -131,11 +131,11 @@ const Header = ({ windowWidth, windowHeight }) => {
                 <Headline windowWidth={windowWidth} windowHeight={windowHeight} />
                 <Subhead windowWidth={windowWidth} />
             </div>
-            <p className="text-left mr-3 md:mr-5 text-sm z-[6] 
+            {/* <p className="text-left mr-3 md:mr-5 text-sm z-[6] 
             hidden sm:block relative top-[100vh] text-right">
-            One of the many jam circles that formed during the workshop.{' '}
+            One of the many jam circles that formed during the workshop.{' '} */}
             <a href="https://chicagomaroon.com/staff_name/nolan-shaffer/">Nolan Shaffer</a>.
-            </p>
+            {/* </p> */}
             <Byline windowWidth={windowWidth} />
         </div>
     );
