@@ -31,28 +31,35 @@ loadfonts(device = "pdf")
 
 setwd("/Users/arijacob/Documents/GitHub/chicago_majors")
 
-classifications = read_xlsx("data/classifications/Degree_Program_Code_Catalog.xlsx", sheet = 2, skip = 3) %>%
-  clean_names() %>%
-  select(code, cip_code, humanities_discipline, classification = bachelors)
+classifications = read_xlsx("data/classifications/final_classification.xlsx") %>%
+  mutate(
+    cip_code = as.character(cip_code)
+  )
 
 data = read_csv("data/ipeds/cleaned/major_numbers.csv") %>%
-  left_join(classifications, by = c("cipcode" = "code")) %>%
+  left_join(classifications, by = c("cipcode" = "cip_code")) %>%
   group_by(instnm, year) %>%
   mutate(
     total_students = sum(total[major_number == 1]),
     total_degrees = sum(total)
-  )
+  ) %>%
+  ungroup()
+
+
+class_naas = read_xlsx("data/classifications/Degree_Program_Code_Catalog.xlsx", sheet = 2, skip = 3) %>%
+  inner_join(
+    data %>% filter(is.na(major_name)) %>% distinct(cipcode),
+    by = c("Code" = "cipcode")
+  ) %>%
+  select(1, 2)
 
 uchicago_econ_2024 = 0.41
 
 share_humanities = data %>%
-  filter((classification == "Humanities" | classification == "Fine & Performing Arts")
-         & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
-                                      "English Language and Literature", "General Humanities/Liberal Studies",
-                                      "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
-                                      "Study of the Arts")
-         ) %>%
-  group_by(instnm, year, classification) %>%
+  filter(
+    classification == "Humanities and Arts"
+  ) %>%
+  group_by(instnm, year) %>%
   summarise(
     share_students = sum(total) / first(total_students),
     share_degrees = sum(total) / first(total_degrees),
@@ -91,7 +98,7 @@ write_csv(share_humanities, "output/ivyplus/per_student/share_humanities_arts.cs
 
 
 share_econ = data %>%
-  filter(grepl("economics", cip_code, ignore.case = T) | classification == "Business & Management") %>%
+  filter(classification == "Business and Economics") %>%
   group_by(instnm, year, classification) %>%
   summarise(
     share_students = sum(total) / first(total_students),
@@ -134,14 +141,10 @@ ggplot(share_econ, aes(x = year, y = share_students, color = factor(is_uchicago)
 ggsave("output/ivyplus/per_student/share_econ_business.png", width = 7.5, height = 4)
 write_csv(share_econ, "output/ivyplus/per_student/share_econ_business.csv")
 
-social_sciences_cip = c(42, 45, 44, 22, 5, 30.05, 30.23, 30.17, 30.28)
+# social_sciences_cip = c(42, 45, 44, 22, 30.05, 30.23, 30.17, 30.28)
 
 share_ss = data %>%
-  mutate(
-    cipcode_2 = as.numeric(substr(cipcode, 1, 2)),
-    cipcode_4 = as.numeric(substr(cipcode, 1, 5))
-  ) %>%
-  filter((cipcode_2 %in% social_sciences_cip | cipcode_4 %in% social_sciences_cip) & !grepl("economics", cip_code, ignore.case = T)) %>%
+  filter(classification == "Other Social Sciences") %>%
   group_by(instnm, year) %>%
   summarise(
     share_students = sum(total) / first(total_students),
@@ -182,13 +185,7 @@ write_csv(share_ss, "output/ivyplus/per_student/share_social_sciences.csv")
 
 
 share_humanities_degrees = data %>%
-  filter(
-    (classification == "Humanities" | classification == "Fine & Performing Arts")
-    & humanities_discipline %in% c("Linguistics", "Comparative Literature", "Classical Studies",
-                                   "English Language and Literature", "General Humanities/Liberal Studies",
-                                   "Selected Interdisciplinary Studies", "Philosphy", "Religion", "History",
-                                   "Study of the Arts")
-  ) %>%
+  filter(classification == "Humanities and Arts") %>%
   group_by(instnm, year, classification) %>%
   summarise(
     share_degrees = sum(total) / first(total_degrees),
@@ -218,7 +215,7 @@ ggplot(share_humanities_degrees, aes(x = year, y = share_degrees, color = factor
   ) +
   scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
-  ylim(0.05, 0.25) +
+  ylim(0.075, 0.3) +
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
 ggsave("output/ivyplus/per_degree/share_humanities_arts.png", width = 7.5, height = 4)
@@ -226,14 +223,7 @@ write_csv(share_humanities_degrees, "output/ivyplus/per_degree/share_humanities_
 
 
 share_ss_degrees = data %>%
-  mutate(
-    cipcode_2 = as.numeric(substr(cipcode, 1, 2)),
-    cipcode_4 = as.numeric(substr(cipcode, 1, 5))
-  ) %>%
-  filter(
-    (cipcode_2 %in% social_sciences_cip | cipcode_4 %in% social_sciences_cip) 
-    & !grepl("economics", cip_code, ignore.case = T)
-  ) %>%
+  filter(classification == "Other Social Sciences") %>%
   group_by(instnm, year) %>%
   summarise(
     share_degrees = sum(total) / first(total_degrees),
@@ -263,7 +253,7 @@ ggplot(share_ss_degrees, aes(x = year, y = share_degrees, color = factor(is_uchi
   ) +
   scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
   theme_custom() +
-  ylim(0.15, 0.375) +
+  ylim(0.10, 0.375) +
   theme(legend.position = c(0.7, 0.85),
         legend.text = element_text(size = 16))
 ggsave("output/ivyplus/per_degree/share_social_sciences.png", width = 7.5, height = 4)
@@ -275,8 +265,7 @@ wharton_uchicago = data %>%
     instnm %in% c("University of Chicago", "University of Pennsylvania")
   ) %>%
   filter(
-    grepl("business", classification, ignore.case = T) 
-    | grepl("economics", cip_code, ignore.case = T)
+   classification == "Business and Economics"
   ) %>%
   group_by(instnm, year) %>%
   summarise(
@@ -318,4 +307,3 @@ ggplot(wharton_uchicago, aes(x = year, y = share_students, color = instnm, shape
         legend.text = element_text(size = 10))
 ggsave("output/ivyplus/per_student/wharton_uchicago.png", width = 7.5, height = 4)
 write_csv(wharton_uchicago, "output/ivyplus/per_student/wharton_uchicago.csv")
-
