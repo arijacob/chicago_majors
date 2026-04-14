@@ -3,7 +3,7 @@ import { motion, useScroll, useTransform } from "motion/react"
 import { Scrollama, Step } from 'react-scrollama';
 import * as d3 from 'd3';
 import LineChart from './LineChart';
-
+import AriChart from './AriChart';
 
 const ScrollBar = ({ scrollYProgress }) => {
     return (
@@ -248,6 +248,35 @@ export const IntroAnimation = (props) => {
             <div className="sticky top-0 h-screen w-full flex justify-center items-center">
                 {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
             </div>
+        </div>
+    )
+}
+
+export const AriChartDemo = () => {
+    
+    const [chartData, setChartData] = useState(null);
+    const containerRef = useRef(null);
+
+
+
+    useEffect(() => {
+        Promise.all([
+            d3.csv("data/english_polisci_trend.csv", d3.autoType),
+        ]).then(([englishPolisciTrend]) => {
+           
+            const englishPolisciTrendData = englishPolisciTrend.map(d => ({
+                year: d.year,
+                total: d.total
+            }));
+
+            setChartData({uchicagoByYear: uchicagoByYear, ivyPlusByYear: ivyPlusByYear});
+        });
+
+    }, []);
+
+    return (
+        <div ref={containerRef} style={{ height: '600vh' }}>
+            <AriChart data={chartData} />
         </div>
     )
 }

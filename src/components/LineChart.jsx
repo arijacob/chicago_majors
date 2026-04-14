@@ -5,7 +5,7 @@ import { annotation, annotationLabel } from 'd3-svg-annotation';
 
 export default function LineChart({ data, xKey, yKey, progress, width = 600, height = 400, margin = { top: 20, right: 60, bottom: 30, left: 0 } }) {
     const svgRef = useRef();
-    const pathRefs = useRef({ uchicago: null, ivy: [] });
+    const pathRefs = useRef({ uchicago: null, uchicagoInner: null, ivy: [] });
     const lengthRefs = useRef({ uchicago: 0, ivy: [] });
     const annotationRef = useRef();
     const annotationGroupRef = useRef();
@@ -101,10 +101,10 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .join('path')
             .attr('fill', 'none')
             .attr('class', 'ivy-plus-line')
-            .attr('stroke', '#aaa')
+            .attr('stroke', '#027BA1')
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 1.2)
-            .attr('opacity', 0.5)
+            .attr('opacity', 0.3)
             .attr('d', d => lineInstructions(d.values));
 
         pathRefs.current.ivy = ivyPaths.nodes().map(node => d3.select(node));
@@ -114,6 +114,14 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('fill', 'none')
             .attr('class', 'line-path')
             .attr('stroke', '#800000')
+            .attr('stroke-width', 6)
+            .attr('d', lineInstructions);
+
+        pathRefs.current.uchicagoInner = svg.append('path')
+            .datum(uchicagoByYear)
+            .attr('fill', 'none')
+            .attr('class', 'line-path-inner')
+            .attr('stroke', '#07BAD2')
             .attr('stroke-width', 4)
             .attr('d', lineInstructions);
 
@@ -122,6 +130,10 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         lengthRefs.current.ivy = pathRefs.current.ivy.map(path => path.node().getTotalLength());
 
         pathRefs.current.uchicago
+            .attr('stroke-dasharray', lengthRefs.current.uchicago)
+            .attr('stroke-dashoffset', lengthRefs.current.uchicago * (1 - uchicagoInitial));
+
+        pathRefs.current.uchicagoInner
             .attr('stroke-dasharray', lengthRefs.current.uchicago)
             .attr('stroke-dashoffset', lengthRefs.current.uchicago * (1 - uchicagoInitial));
 
@@ -168,8 +180,6 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         annotationGroupRef.current.call(annotationRef.current);
 
     
-       
-
         
         const ivyYs = [208, 222, 236, 251, 265, 280, 297, 314]
         const ivyNames = ["Dartmouth", "Harvard", "Columbia, Yale", "Cornell, Princeton", "Brown, UPenn", "Duke", "Standford", "MIT"]
@@ -178,7 +188,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
                 .attr('x', width - margin.right + 5)
                 .attr('y', ivyYs[i])
                 .attr('text-anchor', 'start')
-                .attr('fill', '#666')
+                .attr('fill', '#027BA1')
                 .attr('font-size', 12)
                 .attr('opacity', ivyInitial >= 0.2 ? 0.6 : 0)
                 .attr('font-family', 'Georgia, serif')
@@ -208,6 +218,9 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
     useMotionValueEvent(progress.uchicago, "change", v => {
         if (pathRefs.current.uchicago && lengthRefs.current.uchicago) {
             pathRefs.current.uchicago.attr('stroke-dashoffset', lengthRefs.current.uchicago * (1 - v));
+        }
+        if (pathRefs.current.uchicagoInner && lengthRefs.current.uchicago) {
+            pathRefs.current.uchicagoInner.attr('stroke-dashoffset', lengthRefs.current.uchicago * (1 - v));
         }
         const showAnnotation = v > 0.67;
         const showUChicago = v >= 0.95;

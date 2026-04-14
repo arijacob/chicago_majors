@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  ScrollContainer, IntroAnimation } from "./Interactives.jsx"
+import {  ScrollContainer, IntroAnimation, AriChartDemo } from "./Interactives.jsx"
 import { sections } from '../../public/content.js';
 
 
@@ -63,6 +63,7 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
     return (
         <div className="[overflow-x:clip]">
             <IntroAnimation />
+            <AriChartDemo />
         </div>
     );
 }
