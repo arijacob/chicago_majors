@@ -1,13 +1,14 @@
 export const headlinesm =
-    'What Keeps the Folk Festival Going? Spirit and Community';
+  "UChicago's Changing Majors, Analyzed";
 
-export const headlinelg = 'What Keeps the Folk Festival Going?<br/>Spirit and Community';
+export const headlinelg = "UChicago's Changing Majors, Analyzed";
 
 export const subhead =
-    'The workshops of the storied 66-year festival have built deep roots that offer something for everyone.';
+    'The <i>Maroon</i> looks at 20 years of national enrollment data.';
 export const byline = [
-    "Written and Designed by <a href='https://chicagomaroon.com/staff_name/nolan-shaffer' style='color: maroon;'>Nolan Shaffer</a>",
-    "March 8, 2026"
+    "Data and Reporting by <a href='https://chicagomaroon.com/staff_name/ari-jacob' style='color: maroon;'>Ari Jacob</a>"
+    , "Graphics and Design by <a href='https://chicagomaroon.com/staff_name/nolan-shaffer' style='color: maroon;'>Nolan Shaffer</a>"
+    , "April 20, 2026"
 ]
     
 

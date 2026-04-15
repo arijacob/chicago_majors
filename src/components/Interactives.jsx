@@ -1,7 +1,9 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform } from "motion/react"
 import { Scrollama, Step } from 'react-scrollama';
-
+import * as d3 from 'd3';
+import LineChart from './LineChart';
+import AriChart from './AriChart';
 
 const ScrollBar = ({ scrollYProgress }) => {
     return (
@@ -47,107 +49,6 @@ export const ScrollContainer = (props) => {
         </div>
     );
 };
-
-
-const MAROON_IMAGES = [
-    { src: 'maroon-2009.jpg', positionClass: 'top-[2vh] h-[40%] right-[40vw]' },
-    { src: 'maroon-1980.jpg', positionClass: 'left-[-2vw] sm:left-[10vw] top-0 sm:top-[3vh] h-[35%]' },
-    { src: 'maroon-1962.jpg', positionClass: 'top-[5vh] right-[10vw] h-full' },
-    { src: 'maroon-1985.jpg', positionClass: 'h-[30%] left-[4vw] bottom-[-8vh]' },
-    { src: 'maroon-1961.jpg', positionClass: 'h-[35%] left-[4vw] top-[40%]' },
-    { src: 'maroon-1971.jpg', positionClass: 'right-[0vw] bottom-0 h-[28%] sm:right-[38vw] sm:h-[40%]' },
-];
-
-const CENTERED_TEXT_CONFIG = [
-    { textIndex: 0, stepMin: 0, stepMax: 1, classExtras: 'max-w-[500px] rounded-lg p-4', visibleOpacity: 'opacity-100' },
-    { textIndex: 1, stepMin: 2, stepMax: 2, classExtras: 'max-w-[400px] p-1', visibleOpacity: 'opacity-90' },
-    { textIndex: 5, stepMin: 7, stepMax: 7, classExtras: 'max-w-[500px] rounded-lg p-4', visibleOpacity: 'opacity-100' },
-    ...([9, 10, 11].map((textIndex, i) => ({
-        textIndex,
-        stepMin: 11 + i,
-        stepMax: 11 + i,
-        classExtras: 'max-w-[500px] rounded-lg p-4 z-[5]',
-        visibleOpacity: 'opacity-100',
-    }))),
-];
-
-const AnimationContainerOne = (props) => {
-    const { currentStepIndex, textArray,
-        scrollYProgress, imageArray, width, barLength, height, barStart } = props;
-
-    const spacing = [50, 15, 50];
-    const showMaroon = currentStepIndex === 2 || currentStepIndex === 3;
-
-    const barProgress = useTransform(
-        scrollYProgress,
-        [barStart, barLength],
-        [0, 1]
-    );
-
-    return (
-        <div style={{ height: `${0.67 * textArray.length * height}px` }}>
-            <div className="sticky top-0 h-screen flex items-stretch">
-                <div className="relative flex flex-col w-screen h-full overflow-hidden">
-                    <ScrollBar scrollYProgress={barProgress} />
-                    {MAROON_IMAGES.map(({ src, positionClass }, index) => (
-                        <img
-                            key={src}
-                            src={src}
-                            className={`absolute object-contain transition-opacity duration-[500ms] ${positionClass} ${showMaroon ? 'opacity-100' : 'opacity-0'}`}
-                        />
-                    ))}
-                    {imageArray.slice(0, 3).map((image, index) => (
-                        <img
-                            key={index}
-                            src={image}
-                            className={`w-full h-1/3 object-cover transition-opacity duration-[500ms] ${currentStepIndex >= 4 + index && currentStepIndex <= 6 ? 'opacity-100' : 'opacity-0'}`}
-                        />
-                    ))}
-                    {imageArray.slice(3, 6).map((image, index) => (
-                        <div key={index}>
-                            <img
-                                src={image}
-                                className={`w-full h-1/3 object-cover transition-opacity duration-[500ms] absolute sm:w-1/3 sm:h-1/3 ${currentStepIndex >= 8 + index && currentStepIndex <= 10 ? 'opacity-100' : 'opacity-0'}`}
-                                style={{
-                                    top: `${index * 33.3333}%`,
-                                    left: width < 640 ? '0' : `${index * 33.3333}%`,
-                                }}
-                            />
-                            <p
-                                className={`text-3xl font-bold absolute
-                                    top-1/2 left-1/2 -translate-x-1/2
-                                    -translate-y-1/2 z-[5] p-[.3em]
-                                    text-white sm:text-black transition-opacity
-                                    duration-[500ms] rounded-lg p-4 sm:bg-transparent
-                                    flex items-center whitespace-nowrap
-                                    [text-shadow:_-1px_-1px_0_grey,_1px_-1px_0_grey,_-1px_1px_0_grey,_1px_1px_0_grey] sm:[text-shadow:none]
-                                    ${currentStepIndex - index >= 8 && currentStepIndex <= 10 ? 'opacity-80' : 'opacity-0'}`}
-                                style={{
-                                    top: width < 640 ? `${index * 33.3333 + 5}%` : `${spacing[index]}%`,
-                                    left: width < 640 ? '50%' : `${index * 33.3333 + 17}%`,
-                                }}
-                            >
-                                {textArray[6 + index]}
-                            </p>
-                        </div>
-                    ))}
-                    {CENTERED_TEXT_CONFIG.map(({ textIndex, stepMin, stepMax, classExtras, visibleOpacity }, index) => {
-                        const visible = currentStepIndex >= stepMin && currentStepIndex <= stepMax;
-                        return (
-                            <p
-                                key={index}
-                                className={`text-2xl font-bold absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] transition-opacity duration-[500ms] bg-white ${classExtras} ${visible ? visibleOpacity : 'opacity-0'}`}
-                            >
-                                {textArray[textIndex]}
-                            </p>
-                        );
-                    })}
-                </div>
-            </div>
-        </div>
-    );
-};
-
 
 const AnimationContainerTwo = (props) => {
     const { currentStepIndex, textArray,
@@ -205,53 +106,6 @@ const AnimationContainerTwo = (props) => {
     );
 };
 
-export const AnimationBoxOne = (props) => {
-    const {
-        currentStepIndex,
-        scrollText,
-        paragraphText,
-        windowWidth,
-        imageArray,
-        barLength = 1,
-        barStart = 0,
-        onStepEnter,
-        onStepExit,
-        height,
-        width,
-        start,
-    } = props;
-    const stepsContainerRef = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: stepsContainerRef,
-        offset: ["start end", "end start"],
-    });
-
-    return (
-        <div className="relative">
-            <AnimationContainerOne
-                currentStepIndex={currentStepIndex}
-                textArray={scrollText}
-                scrollYProgress={scrollYProgress}
-                imageArray={imageArray}
-                height={height}
-                width={width}
-                barLength={barLength}
-                barStart={barStart}
-            />
-            <div ref={stepsContainerRef} className="absolute top-[50vh]">
-                <ScrollContainer
-                    onStepEnter={onStepEnter}
-                    onStepExit={onStepExit}
-                    textArray={scrollText}
-                    start={start}
-                    height={height}
-                />
-            </div>
-        </div>
-    );
-}
-
-
 export const AnimationBoxTwo = (props) => {
     const {
         currentStepIndex,
@@ -296,4 +150,133 @@ export const AnimationBoxTwo = (props) => {
             </div>
         </div>
     );
+}
+
+export const IntroAnimation = (props) => {
+
+    const [chartData, setChartData] = useState(null);
+    const containerRef = useRef(null);
+    
+    const { scrollYProgress } = useScroll({
+        target: containerRef,
+        offset: ["start end", "end start"],
+    });
+
+    const uchicagoProgress = useTransform(
+        scrollYProgress,
+        [0.16, 0.335],
+        [0, 1]
+    );
+
+    const ivyProgress = useTransform(
+        scrollYProgress,
+        [0.335, 0.85],
+        [0, 1]
+    );
+
+    const progresses = {uchicago: uchicagoProgress, ivy: ivyProgress};
+    console.log(uchicagoProgress.current)
+
+    useEffect(() => {
+        Promise.all([
+            d3.csv("data/majors.csv", d3.autoType),
+            d3.csv("data/classifications.csv", d3.autoType)
+        ]).then(([majors, classifications]) => {
+            const econBusiness = majors.filter(d =>
+                d.cip_code.includes("Economics") || d.cip_code.includes("Business")
+            );
+
+            const uchicagoByYear = d3.rollups(
+                    econBusiness.filter(d => d.instnm === "University of Chicago"),
+                    v => ({
+                        total: d3.sum(v, d => d.total),
+                        degrees: v[0].total_degrees
+                    }),
+                    d => d.year
+                )
+                .map(([year, vals]) => ({ 
+                    year, 
+                    total: (vals.total / vals.degrees) * 100
+                }))
+                .sort((a, b) => a.year - b.year);
+
+            const ivyPlusByYear = d3.rollups(
+                    econBusiness.filter(d => d.instnm != "University of Chicago"),
+                    v => ({
+                        total: d3.sum(v, d => d.total),
+                        degrees: v[0].total_degrees
+                    }),
+                    d => d.instnm,
+                    d => d.year
+                )
+                .map(([instnm, yearlyValues]) => ({
+                    instnm,
+                    values: yearlyValues
+                        .map(([year, vals]) => ({
+                            year,
+                            total: (vals.total / vals.degrees) * 100
+                        }))
+                        .sort((a, b) => a.year - b.year)
+                }))
+                .sort((a, b) => d3.ascending(a.instnm, b.instnm));
+
+            // Log an ordered list of totals in 2024 for the ivyPlusByYear
+            const ivyTotals2024 = ivyPlusByYear
+                .map(instObj => {
+                    const year2024 = instObj.values.find(v => v.year === 2024);
+                    return {
+                        instnm: instObj.instnm,
+                        total: year2024 ? year2024.total : null
+                    };
+                })
+                .filter(d => d.total !== null)
+                .sort((a, b) => b.total - a.total); // e.g. descending order; adjust as needed
+
+            console.log("IvyPlus 2024 totals ordered:", ivyTotals2024);
+
+            const codes = classifications
+                .map(d => ({ ...d }))
+                .sort((a, b) => d3.ascending(a.cip_code, b.cip_code));
+
+            setChartData({uchicagoByYear: uchicagoByYear, ivyPlusByYear: ivyPlusByYear});
+        });
+
+    }, []);
+
+    return (
+        <div ref={containerRef} style={{ height: '600vh' }}>
+            <div className="sticky top-0 h-screen w-full flex justify-center items-center">
+                {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
+            </div>
+        </div>
+    )
+}
+
+export const AriChartDemo = () => {
+    
+    const [chartData, setChartData] = useState(null);
+    const containerRef = useRef(null);
+
+
+
+    useEffect(() => {
+        Promise.all([
+            d3.csv("data/english_polisci_trend.csv", d3.autoType),
+        ]).then(([englishPolisciTrend]) => {
+           
+            const englishPolisciTrendData = englishPolisciTrend.map(d => ({
+                year: d.year,
+                total: d.total
+            }));
+
+            setChartData({uchicagoByYear: uchicagoByYear, ivyPlusByYear: ivyPlusByYear});
+        });
+
+    }, []);
+
+    return (
+        <div ref={containerRef} style={{ height: '600vh' }}>
+            <AriChart data={chartData} />
+        </div>
+    )
 }
