@@ -496,3 +496,16 @@ ggplot(phil_history, aes(x = year, y = share_students, color = major_name, shape
 ggsave("output/uchicago/per_student/phil_history.png", width = 7.5, height = 4)  
 write_csv(phil_history, "output/uchicago/per_student/phil_history_trend.csv")
 
+
+change = data %>%
+  filter(year == 2005 | year == 2024) %>%
+  group_by(classification, year) %>%
+  summarise(
+    share_students = (sum(total) / first(total_students)) * 100
+  ) %>%
+  pivot_wider(names_from = year, values_from = share_students) %>%
+  drop_na() %>%
+  mutate(
+   # `2024` = if_else(classification == "Economics", , `2024`)
+  )
+write_csv(change, "output/uchicago/per_student/classification_changes_2005_2024.csv")
