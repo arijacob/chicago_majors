@@ -509,3 +509,45 @@ change = data %>%
    # `2024` = if_else(classification == "Economics", , `2024`)
   )
 write_csv(change, "output/uchicago/per_student/classification_changes_2005_2024.csv")
+
+fundamentals_english = data %>%
+  filter(
+    cipcode %in% c('24.0101', '45.0201')
+  ) %>%
+  mutate(
+    classification = case_when(
+      cipcode == '24.0101' ~ "Fundamentals",
+      cipcode == '23.0101' ~ "English",
+      cipcode == '45.0201' ~ "Anthropology"
+    )
+  ) %>%
+  group_by(year, classification) %>%
+  summarise(
+    share_students = sum(total) / first(total_students)
+  ) %>%
+  group_by(classification) %>%
+  mutate(
+    relative_share = share_students / first(share_students) 
+  )
+
+
+ggplot(fundamentals_english, aes(x = year, y = share_students, color = classification, shape = classification)) +
+  geom_line() +
+  geom_point() +
+  labs(
+    x = NULL,
+    y = "Share of students",
+    title = "Fundamentals and English majors are shrinking",
+    color = NULL,
+    shape = NULL
+  ) +
+  scale_x_continuous(breaks = seq(2005, 2025, 3)) +
+  theme_custom() +
+  scale_color_manual(values = c(
+    "Fundamentals" = "#1b9e77",
+    "English" = "#d95f02"
+  )) +
+  theme(
+    legend.position = c(0.8, 0.85),
+    legend.text = element_text(size = 12)
+  )
