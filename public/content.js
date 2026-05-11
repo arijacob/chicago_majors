@@ -1,5 +1,5 @@
 export const headlinesm =
-  "UChicago's Changing Majors, Analyzed";
+  "The Decline of the Liberal Arts at Chicago";
 
 export const headlinelg = "UChicago's Changing Majors, Analyzed";
 

@@ -184,6 +184,55 @@ ggsave("output/ivyplus/per_student/share_social_sciences.png", width = 7.5, heig
 write_csv(share_ss, "output/ivyplus/per_student/share_social_sciences.csv")
 
 
+share_ss_hum = data %>%
+  filter(classification %in% c("Other Social Sciences", "Humanities and Arts")) %>%
+  group_by(instnm, year) %>%
+  summarise(
+    share_students = sum(total) / first(total_students),
+    share_degrees = sum(total) / first(total_degrees),
+    total_students = first(total_students),
+    total_awards = first(total_degrees)
+  ) %>%
+  mutate(
+    is_uchicago = ifelse(instnm == "University of Chicago", "University of Chicago", "Other Ivy Plus")
+  ) %>%
+  mutate(
+    is_uchicago = factor(is_uchicago, levels = c("University of Chicago", "Other Ivy Plus"))
+  ) %>%
+  group_by(is_uchicago, year) %>%
+  summarise(
+    share_students = weighted.mean(share_students, total_students),
+    share_degrees = weighted.mean(share_degrees, total_awards)
+  ) %>%
+  drop_na() %>%
+  pivot_longer(cols = c(share_students, share_degrees), names_to = "metric", values_to = "value") %>%
+  mutate(
+    metric = case_when(
+      metric == "share_students" ~ "Share of students",
+      metric == "share_degrees" ~ "Share of degrees"
+    ),
+    metric = factor(metric, levels = c("Share of students", "Share of degrees"))
+  )
+
+ggplot(share_ss_hum, aes(x = year, y = value, color = factor(is_uchicago), shape = is_uchicago))+
+  geom_point() +
+  geom_line() +
+  scale_color_brewer(palette = "Set2") +
+  labs(
+    x = NULL,
+    y = "",
+    title  = "Social science, humanities, and arts majors",
+    color = NULL,
+    shape = NULL
+  ) +
+  scale_color_manual(values = c("University of Chicago" = "#800000", "Other Ivy Plus" = "#737373")) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
+  facet_wrap(~metric, scale = "free_y") +
+  theme_custom() +
+  theme(legend.position = "bottom")
+ggsave("output/ivyplus/per_student/share_social_sciences_humanities.png", width = 10, height = 5)
+write_csv(share_ss_hum, "output/ivyplus/per_student/share_social_sciences_humanities.csv")
+
 share_humanities_degrees = data %>%
   filter(classification == "Humanities and Arts") %>%
   group_by(instnm, year, classification) %>%

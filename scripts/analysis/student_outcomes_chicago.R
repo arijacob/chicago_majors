@@ -85,6 +85,9 @@ ggplot(finance_business_data, aes(x = year, y = share)) +
   )
 ggsave("output/uchicago/outcomes/finance_business.png", width = 8, height = 4)
 
+output_finance_buisness = finance_business_data %>%
+  select(year, share)
+write_csv(output_finance_buisness, "output/uchicago/outcomes/finance_business.csv")
 
 consulting = data %>%
   filter(grepl("Consult", industry)) %>%

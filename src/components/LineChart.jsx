@@ -57,7 +57,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('color', 'gray')
             .call(
                 d3.axisLeft(y)
-                    .tickValues([25, 20, 15, 10, 5, 0])
+                    .tickValues([40, 30, 20, 10, 0])
                     .tickSize(0)
             )
             .call(g => g.select('.domain').remove())
@@ -68,7 +68,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             );
 
         // Add horizontal grid lines every 5 units on the y axis
-        const yTicks = d3.range(5, 26, 5).reverse();
+        const yTicks = d3.range(0, 41, 10).reverse();
         svg.append('g')
             .attr('class', 'y-grid')
             .selectAll('line')
@@ -93,7 +93,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('% of Economics Majors');
+            .text('% Share of Students Majoring in Economics');
 
         const ivyPaths = svg.append('g')
             .selectAll('.ivy-plus-line')
@@ -101,7 +101,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .join('path')
             .attr('fill', 'none')
             .attr('class', 'ivy-plus-line')
-            .attr('stroke', '#027BA1')
+            .attr('stroke', '#1e1e1e')
             .attr('stroke-linecap', 'round')
             .attr('stroke-width', 1.2)
             .attr('opacity', 0.3)
@@ -114,14 +114,14 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('fill', 'none')
             .attr('class', 'line-path')
             .attr('stroke', '#800000')
-            .attr('stroke-width', 6)
+            .attr('stroke-width', 2)
             .attr('d', lineInstructions);
 
         pathRefs.current.uchicagoInner = svg.append('path')
             .datum(uchicagoByYear)
             .attr('fill', 'none')
             .attr('class', 'line-path-inner')
-            .attr('stroke', '#07BAD2')
+            .attr('stroke', '#800000')
             .attr('stroke-width', 4)
             .attr('d', lineInstructions);
 
@@ -153,7 +153,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
                 textAnchor: 'middle',
                 dx: -25,
                 dy: -35,
-                color: "#636363"
+                color: "#1e1e1e"
             },
         ];
 
@@ -188,7 +188,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
                 .attr('x', width - margin.right + 5)
                 .attr('y', ivyYs[i])
                 .attr('text-anchor', 'start')
-                .attr('fill', '#027BA1')
+                .attr('fill', '#1e1e1e')
                 .attr('font-size', 12)
                 .attr('opacity', ivyInitial >= 0.2 ? 0.6 : 0)
                 .attr('font-family', 'Georgia, serif')

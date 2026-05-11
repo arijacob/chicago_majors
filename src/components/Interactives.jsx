@@ -3,7 +3,11 @@ import { motion, useScroll, useTransform } from "motion/react"
 import { Scrollama, Step } from 'react-scrollama';
 import * as d3 from 'd3';
 import LineChart from './LineChart';
-import AriChart from './AriChart';
+import AriChart from './english_polisci_chart';
+import SubstitutionChart from './substitution_chart';
+import PennChart from './penn_chart';
+import OutcomesChart from './outcomes_chart';
+import SocialHumChart from './socialhum_chart';
 
 const ScrollBar = ({ scrollYProgress }) => {
     return (
@@ -19,9 +23,7 @@ const ScrollBar = ({ scrollYProgress }) => {
             </div>
         </div>
     )
-}
-
-
+};
 
 
 export const ScrollContainer = (props) => {
@@ -190,13 +192,13 @@ export const IntroAnimation = (props) => {
                     econBusiness.filter(d => d.instnm === "University of Chicago"),
                     v => ({
                         total: d3.sum(v, d => d.total),
-                        degrees: v[0].total_degrees
+                        students: v[0].total_students
                     }),
                     d => d.year
                 )
                 .map(([year, vals]) => ({ 
                     year, 
-                    total: (vals.total / vals.degrees) * 100
+                    total: (vals.total / vals.students) * 100
                 }))
                 .sort((a, b) => a.year - b.year);
 
@@ -204,7 +206,7 @@ export const IntroAnimation = (props) => {
                     econBusiness.filter(d => d.instnm != "University of Chicago"),
                     v => ({
                         total: d3.sum(v, d => d.total),
-                        degrees: v[0].total_degrees
+                        students: v[0].total_students
                     }),
                     d => d.instnm,
                     d => d.year
@@ -214,7 +216,7 @@ export const IntroAnimation = (props) => {
                     values: yearlyValues
                         .map(([year, vals]) => ({
                             year,
-                            total: (vals.total / vals.degrees) * 100
+                            total: (vals.total / vals.students) * 100
                         }))
                         .sort((a, b) => a.year - b.year)
                 }))
@@ -252,6 +254,7 @@ export const IntroAnimation = (props) => {
     )
 }
 
+// Chart of english and political science
 export const AriChartDemo = () => {
     
     const [chartData, setChartData] = useState(null);
@@ -266,17 +269,155 @@ export const AriChartDemo = () => {
            
             const englishPolisciTrendData = englishPolisciTrend.map(d => ({
                 year: d.year,
-                total: d.total
+                english: d["English"] * 100,
+                politicalScience: d["Political Science"] * 100
             }));
 
-            setChartData({uchicagoByYear: uchicagoByYear, ivyPlusByYear: ivyPlusByYear});
+            setChartData(englishPolisciTrendData);
         });
 
     }, []);
 
     return (
-        <div ref={containerRef} style={{ height: '600vh' }}>
+        <div ref={containerRef}>
             <AriChart data={chartData} />
         </div>
     )
 }
+
+// chart for substitution
+export const Substitution = () => {
+
+    const [chartData, setChartData] = useState(null);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        d3.csv("data/substitution_trend.csv", d3.autoType).then((rows) => {
+           const byYear = d3.rollup(
+            rows,
+            v => {
+                const entry = { year: v[0].year };
+                v.forEach(d => {
+                    if (d.classification === "Math and Stats") entry.math = d.share_students * 100;
+                    if (d.classification === "Public Policy") entry.publicPolicy = d.share_students * 100;
+                });
+                return entry;
+            },
+            d => d.year
+        );
+
+        const wideData = Array.from(byYear.values()).sort((a, b) => a.year - b.year);
+        setChartData(wideData);
+        });
+    }, []);
+
+    return (
+        <div ref={containerRef} >
+            <SubstitutionChart data={chartData} />
+        </div>  
+    );
+};
+
+// chart for penn comparison
+export const Penn = () => {
+
+    const [chartData, setChartData] = useState(null);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+        d3.csv("data/wharton_uchicago.csv", d3.autoType).then((rows) => {
+           const byYear = d3.rollup(
+            rows,
+            v => {
+                const entry = { year: v[0].year };
+                v.forEach(d => {
+                    if (d.instnm === "University of Chicago") entry.uchicago = d.share_students * 100;
+                    if (d.instnm === "University of Pennsylvania") entry.penn = d.share_students * 100;
+                });
+                return entry;
+            },
+            d => d.year
+        );
+
+        const wideData = Array.from(byYear.values()).sort((a, b) => a.year - b.year);
+        setChartData(wideData);
+        });
+    }, []);
+
+    return (
+        <div ref={containerRef} >
+            <PennChart data={chartData} />
+        </div>  
+    );
+};
+
+// chart for outcomes
+export const Outcomes = () => {
+
+    const [chartData, setChartData] = useState(null);
+    const containerRef = useRef(null);
+
+    useEffect(() => {
+    d3.csv("data/finance_business.csv", d3.autoType).then((rows) => {
+        const wideData = rows
+            .map(d => {
+                const year = d.year === "2021-2022" ? 2021.5 : +d.year;
+                // share is already a percentage, don't multiply
+                const share = typeof d.share === 'number' ? d.share : null;
+                return { year, share, originalYear: d.year };
+            })
+            .filter(d => d.share !== null && !isNaN(d.year))
+            .sort((a, b) => a.year - b.year);
+
+        console.log('Parsed data:', wideData);
+        setChartData(wideData);
+    });
+}, []);
+
+    return (
+        <div ref={containerRef}>
+            <OutcomesChart data={chartData} />
+        </div>
+    );
+};
+
+// Two-panel chart for share of students vs. share of degrees
+export const SocialSciencesHumanities = () => {
+
+    const [studentsData, setStudentsData] = useState(null);
+    const [degreesData, setDegreesData] = useState(null);
+
+    useEffect(() => {
+        d3.csv("data/share_social_sciences_humanities.csv", d3.autoType).then((rows) => {
+            // Helper that pivots a filtered subset (one metric) into wide format
+            const pivotByYear = (filteredRows) => {
+                const byYear = d3.rollup(
+                    filteredRows,
+                    v => {
+                        const entry = { year: v[0].year };
+                        v.forEach(d => {
+                            if (d.is_uchicago === "University of Chicago") entry.uchicago = d.value * 100;
+                            if (d.is_uchicago === "Other Ivy Plus") entry.otherIvy = d.value * 100;
+                        });
+                        return entry;
+                    },
+                    d => d.year
+                );
+                return Array.from(byYear.values()).sort((a, b) => a.year - b.year);
+            };
+
+            const studentsRows = rows.filter(d => d.metric === "Share of students");
+            const degreesRows = rows.filter(d => d.metric === "Share of degrees");
+
+            setStudentsData(pivotByYear(studentsRows));
+            setDegreesData(pivotByYear(degreesRows));
+        });
+    }, []);
+
+    return (
+        <div className="flex justify-center gap-3">
+            <SocialHumChart data={studentsData} title="Share of Students" />
+            <SocialHumChart data={degreesData} title="Share of Degrees" />
+        </div>
+    );
+};
