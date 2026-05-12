@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-export default function SubstitutionChart({ data, width = 700, height = 400, margin = { top: 20, right: 140, bottom: 30, left: 40 } }) {
+export default function SubstitutionChart({ data, width = 700, height = 400, margin = { top: 60, right: 80, bottom: 30, left: 50 } }) {
     const svgRef = useRef();
 
     useEffect(() => {

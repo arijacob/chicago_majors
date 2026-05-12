@@ -166,24 +166,49 @@ export const IntroAnimation = (props) => {
 
     const uchicagoProgress = useTransform(
         scrollYProgress,
-        [0.16, 0.335],
+        [0.16, 0.3],
         [0, 1]
     );
 
     const ivyProgress = useTransform(
         scrollYProgress,
-        [0.335, 0.85],
+        [0.32, 0.6],
         [0, 1]
     );
 
-    const progresses = {uchicago: uchicagoProgress, ivy: ivyProgress};
+    const ivyFadeProgress = useTransform(
+        scrollYProgress,
+        [0.68, 0.70],
+        [0, 1]
+    );
+
+    const annotationProgress = useTransform(
+        scrollYProgress,
+         [0.72, 0.78],
+          [0, 1]
+    );
+
+    const humProgress = useTransform(
+        scrollYProgress,
+        [0.8, 0.9],
+        [0, 1]
+    )
+
+    const progresses = {
+        uchicago: uchicagoProgress,
+         ivy: ivyProgress,
+          ivyFade: ivyFadeProgress,
+           annotation: annotationProgress,
+            hum: humProgress,
+        };
     console.log(uchicagoProgress.current)
 
     useEffect(() => {
         Promise.all([
             d3.csv("data/majors.csv", d3.autoType),
-            d3.csv("data/classifications.csv", d3.autoType)
-        ]).then(([majors, classifications]) => {
+            d3.csv("data/classifications.csv", d3.autoType),
+            d3.csv("data/economics_humanities.csv", d3.autoType)
+        ]).then(([majors, classifications, humanities]) => {
             const econBusiness = majors.filter(d =>
                 d.cip_code.includes("Economics") || d.cip_code.includes("Business")
             );
@@ -222,6 +247,15 @@ export const IntroAnimation = (props) => {
                 }))
                 .sort((a, b) => d3.ascending(a.instnm, b.instnm));
 
+                // ===== Humanities at UChicago =====
+                const humByYear = humanities
+                    .filter(d => d.classification === "Humanities and Arts")
+                    .map(d => ({
+                        year: d.year,
+                        total: d.share_students * 100
+                    }))
+                    .sort((a, b) => a.year - b.year);
+
             // Log an ordered list of totals in 2024 for the ivyPlusByYear
             const ivyTotals2024 = ivyPlusByYear
                 .map(instObj => {
@@ -240,13 +274,17 @@ export const IntroAnimation = (props) => {
                 .map(d => ({ ...d }))
                 .sort((a, b) => d3.ascending(a.cip_code, b.cip_code));
 
-            setChartData({uchicagoByYear: uchicagoByYear, ivyPlusByYear: ivyPlusByYear});
+            setChartData({
+                uchicagoByYear: uchicagoByYear,
+                ivyPlusByYear: ivyPlusByYear,
+                humByYear: humByYear
+                });
         });
 
     }, []);
 
     return (
-        <div ref={containerRef} style={{ height: '600vh' }}>
+        <div ref={containerRef} style={{ height: '1000vh' }}>
             <div className="sticky top-0 h-screen w-full flex justify-center items-center">
                 {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
             </div>

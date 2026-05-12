@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-export default function SocialHumChart({ data, title, width = 500, height = 250,  margin = { top: 60, right: 80, bottom: 30, left: 50 } }) {
+export default function SocialHumChart({ data, title, width = 500, height = 330,  margin = { top: 60, right: 80, bottom: 30, left: 50 } }) {
     const svgRef = useRef();
 
     useEffect(() => {

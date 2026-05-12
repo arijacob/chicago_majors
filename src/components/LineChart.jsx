@@ -1,26 +1,28 @@
 import React, { useRef, useEffect } from 'react';
 import { useMotionValueEvent } from 'motion/react';
 import * as d3 from 'd3';
-import { annotation, annotationLabel } from 'd3-svg-annotation';
 
 export default function LineChart({ data, xKey, yKey, progress, width = 600, height = 400, margin = { top: 20, right: 60, bottom: 30, left: 0 } }) {
     const svgRef = useRef();
-    const pathRefs = useRef({ uchicago: null, uchicagoInner: null, ivy: [] });
-    const lengthRefs = useRef({ uchicago: 0, ivy: [] });
-    const annotationRef = useRef();
-    const annotationGroupRef = useRef();
+    const pathRefs = useRef({ uchicago: null, uchicagoInner: null, ivy: [], hum: null });
+    const lengthRefs = useRef({ uchicago: 0, ivy: [], hum: 0});
     const textRefs = useRef({ uchicago: null, ivy: [] });
-    const labelVisibilityRef = useRef({ annotation: false, uchicago: false, ivy: false });
+    const labelVisibilityRef = useRef({ uchicago: false, ivy: false });
+    const annotationDottedLineRef = useRef();
+    const annotationLabelRef = useRef();
+
     useEffect(() => {
         if (!data) return;
-        const { uchicagoByYear, ivyPlusByYear } = data;
+        const { uchicagoByYear, ivyPlusByYear, humByYear } = data;
 
         const svg = d3.select(svgRef.current);
         svg.selectAll('*').remove();
+
         const ivySeries = ivyPlusByYear ?? [];
         const ivyPoints = ivySeries.flatMap(d => d.values);
         const allPoints = [...uchicagoByYear, ...ivyPoints];
 
+        // Scales
         const x = d3.scaleLinear()
             .domain(d3.extent(allPoints, d => d[xKey]))
             .range([margin.left, width - margin.right]);
@@ -33,10 +35,9 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .x(d => x(d[xKey]))
             .y(d => y(d[yKey]));
 
-
-        // Add extra axis-to-data spacing
         const axisPadding = 5;
 
+        // x axis
         svg.append('g')
             .attr('transform', `translate(0,${height - margin.bottom + axisPadding})`)
             .attr('color', 'gray')
@@ -53,7 +54,6 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         // y axis
         svg.append('g')
             .attr('transform', `translate(${margin.left - axisPadding},0)`)
-            .attr('font-family', 'Playfair Display, serif')
             .attr('color', 'gray')
             .call(
                 d3.axisLeft(y)
@@ -64,10 +64,9 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .call(g => g.selectAll('.tick text')
                 .attr('font-size', 16)
                 .attr('font-family', 'Playfair Display, serif')
-                .attr('color', 'gray')
             );
 
-        // Add horizontal grid lines every 5 units on the y axis
+        // Horizontal gridlines
         const yTicks = d3.range(0, 41, 10).reverse();
         svg.append('g')
             .attr('class', 'y-grid')
@@ -81,20 +80,45 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('stroke', '#e6e6e6')
             .attr('stroke-width', 1);
 
-
-
-        const ivyInitial = progress ? progress.ivy.get() : 0;
+        // Read initial progress values
         const uchicagoInitial = progress ? progress.uchicago.get() : 0;
+        const ivyInitial = progress ? progress.ivy.get() : 0;
+        const annotationInitial = progress ? progress.annotation.get() : 0;
 
+        // Chart title
         svg.append('text')
             .attr('x', margin.left)
             .attr('y', margin.top - 25)
-            .attr('text-anchor', 'center')
+            .attr('text-anchor', 'start')
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
             .text('% Share of Students Majoring in Economics');
 
+        // Dotted vertical line at 2018 (initially hidden)
+        const annotationYear = 2018;
+
+        annotationDottedLineRef.current = svg.append('line')
+            .attr('x1', x(annotationYear))
+            .attr('x2', x(annotationYear))
+            .attr('y1', margin.top)
+            .attr('y2', height - margin.bottom)
+            .attr('stroke', '#666')
+            .attr('stroke-width', 1)
+            .attr('stroke-dasharray', '4,4')
+            .attr('opacity', annotationInitial);
+
+        annotationLabelRef.current = svg.append('text')
+            .attr('x', x(2013.8))
+            .attr('y', margin.top + 20)
+            .attr('text-anchor', 'middle')
+            .attr('fill', '#666')
+            .attr('font-size', 16)
+            .attr('font-family', 'Georgia, serif')
+            .attr('opacity', annotationInitial)
+            .text('Business Economics introduced');
+
+        // Ivy Plus lines
         const ivyPaths = svg.append('g')
             .selectAll('.ivy-plus-line')
             .data(ivySeries)
@@ -109,6 +133,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
 
         pathRefs.current.ivy = ivyPaths.nodes().map(node => d3.select(node));
 
+        // UChicago line + thicker inner highlight
         pathRefs.current.uchicago = svg.append('path')
             .datum(uchicagoByYear)
             .attr('fill', 'none')
@@ -122,10 +147,27 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('fill', 'none')
             .attr('class', 'line-path-inner')
             .attr('stroke', '#800000')
-            .attr('stroke-width', 4)
+            .attr('stroke-width', 3)
             .attr('d', lineInstructions);
 
-        
+        // Humanities line — forest green, initially hidden
+        const humInitial = progress ? progress.hum.get() : 0;
+
+        pathRefs.current.hum = svg.append('path')
+            .datum(humByYear)
+            .attr('fill', 'none')
+            .attr('class', 'line-path-hum')
+            .attr('stroke', '#2d5a3f')
+            .attr('stroke-width', 3)
+            .attr('d', lineInstructions);
+
+        lengthRefs.current.hum = pathRefs.current.hum.node().getTotalLength();
+
+        pathRefs.current.hum
+            .attr('stroke-dasharray', lengthRefs.current.hum)
+            .attr('stroke-dashoffset', lengthRefs.current.hum * (1 - humInitial));
+
+        // Measure path lengths for the draw-on animation
         lengthRefs.current.uchicago = pathRefs.current.uchicago.node().getTotalLength();
         lengthRefs.current.ivy = pathRefs.current.ivy.map(path => path.node().getTotalLength());
 
@@ -144,45 +186,9 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
                 .attr('stroke-dashoffset', length * (1 - ivyInitial));
         });
 
-        const annotationPoint = uchicagoByYear.find(d => d[xKey] === 2018);   
-        const annotations = [
-            {
-                note: { label: "Business Economics introduced", wrap: 200 }, 
-                x: x(annotationPoint[xKey]),
-                y: y(annotationPoint[yKey]),
-                textAnchor: 'middle',
-                dx: -25,
-                dy: -35,
-                color: "#1e1e1e"
-            },
-        ];
-
-        annotationRef.current = annotation()
-            .type(annotationLabel)
-            .annotations(annotations);
-
-        annotationGroupRef.current = svg.append('g')
-            .attr('class', 'annotation-group')
-            .attr('opacity', uchicagoInitial > 0.67 ? 1 : 0)
-            .attr('font-size', 17)
-            .attr('text-anchor', 'left')
-            .attr('font-family', 'Georgia, serif');
-
-        // Add white rect behind annotation (inserted before annotation)
-        annotationGroupRef.current.append('rect')
-            .attr('x', x(annotationPoint[xKey]) - 110)
-            .attr('y', y(annotationPoint[yKey]) - 80)
-            .attr('width', 170)
-            .attr('height', 40)
-            .attr('fill', 'white')
-            .attr('opacity', uchicagoInitial > 0.67 ? 1 : 0)
-
-        annotationGroupRef.current.call(annotationRef.current);
-
-    
-        
-        const ivyYs = [208, 222, 236, 251, 265, 280, 297, 314]
-        const ivyNames = ["Dartmouth", "Harvard", "Columbia, Yale", "Cornell, Princeton", "Brown, UPenn", "Duke", "Standford", "MIT"]
+        // School name labels (right side)
+        const ivyYs = [208, 222, 236, 251, 265, 280, 297, 314];
+        const ivyNames = ["Dartmouth", "Harvard", "Columbia, Yale", "Cornell, Princeton", "Brown, UPenn", "Duke", "Stanford", "MIT"];
         const ivyTexts = ivyNames.map((name, i) => {
             return svg.append('text')
                 .attr('x', width - margin.right + 5)
@@ -207,14 +213,12 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
 
         textRefs.current = { uchicago: uchicagoText, ivy: ivyTexts };
         labelVisibilityRef.current = {
-            annotation: uchicagoInitial > 0.67,
             uchicago: uchicagoInitial > 0.1,
             ivy: ivyInitial >= 0.2
         };
-    
-        
     }, [data]);
 
+    // UChicago line draw-on + label fade-in
     useMotionValueEvent(progress.uchicago, "change", v => {
         if (pathRefs.current.uchicago && lengthRefs.current.uchicago) {
             pathRefs.current.uchicago.attr('stroke-dashoffset', lengthRefs.current.uchicago * (1 - v));
@@ -222,43 +226,59 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         if (pathRefs.current.uchicagoInner && lengthRefs.current.uchicago) {
             pathRefs.current.uchicagoInner.attr('stroke-dashoffset', lengthRefs.current.uchicago * (1 - v));
         }
-        const showAnnotation = v > 0.67;
         const showUChicago = v >= 0.95;
-
-        if (annotationGroupRef.current && labelVisibilityRef.current.annotation !== showAnnotation) {
-            annotationGroupRef.current
-              .transition()
-              .duration(200)
-              .style('opacity', showAnnotation ? 1 : 0);
-            labelVisibilityRef.current.annotation = showAnnotation;
-        }
         if (textRefs.current.uchicago && labelVisibilityRef.current.uchicago !== showUChicago) {
-            textRefs.current.uchicago
-                .transition()
-                .duration(200)
-                .style('opacity', showUChicago ? 1 : 0);
+            textRefs.current.uchicago.attr('opacity', showUChicago ? 1 : 0);
             labelVisibilityRef.current.uchicago = showUChicago;
         }
     });
 
+    // Ivy Plus draw-on + labels fade-in
     useMotionValueEvent(progress.ivy, "change", v => {
-        const showIvy = v >= 0.95;
-
         pathRefs.current.ivy.forEach((path, index) => {
             const length = lengthRefs.current.ivy[index];
             if (path && length) {
                 path.attr('stroke-dashoffset', length * (1 - v));
             }
-            if (textRefs.current.ivy.length && labelVisibilityRef.current.ivy !== showIvy) {
-                textRefs.current.ivy.forEach(text => {
-                    text
-                        .transition()
-                        .duration(200)
-                        .style('opacity', showIvy ? 0.6 : 0);
-                });
-                labelVisibilityRef.current.ivy = showIvy;
+        });
+
+        const showIvy = v >= 0.95;
+        if (textRefs.current.ivy.length && labelVisibilityRef.current.ivy !== showIvy) {
+            textRefs.current.ivy.forEach(text => {
+                text.attr('opacity', showIvy ? 0.6 : 0);
+            });
+            labelVisibilityRef.current.ivy = showIvy;
+        }
+    });
+
+    // Ivy Plus fade-out (lines and labels)
+    useMotionValueEvent(progress.ivyFade, "change", v => {
+        pathRefs.current.ivy.forEach(path => {
+            if (path) {
+                path.attr('opacity', 0.3 * (1 - v));
             }
         });
+        textRefs.current.ivy.forEach(text => {
+            if (text) {
+                text.attr('opacity', 0.6 * (1 - v));
+            }
+        });
+    });
+
+    // "Business Economics introduced" annotation fade-in
+    useMotionValueEvent(progress.annotation, "change", v => {
+        if (annotationDottedLineRef.current) {
+            annotationDottedLineRef.current.attr('opacity', v);
+        }
+        if (annotationLabelRef.current) {
+            annotationLabelRef.current.attr('opacity', v);
+        }
+    });
+
+    useMotionValueEvent(progress.hum, "change", v => {
+        if (pathRefs.current.hum && lengthRefs.current.hum) {
+            pathRefs.current.hum.attr('stroke-dashoffset', lengthRefs.current.hum * (1 - v));
+        }
     });
 
     return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
