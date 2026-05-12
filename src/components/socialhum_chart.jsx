@@ -54,6 +54,7 @@ export default function SocialHumChart({ data, title, width = 500, height = 330,
             .call(
                 d3.axisLeft(y)
                     .tickValues(yTicks)
+                    .tickFormat(d => `${d}%`)
                     .tickSize(0)
             )
             .call(g => g.select('.domain').remove())

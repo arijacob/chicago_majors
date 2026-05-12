@@ -54,6 +54,7 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
             .call(
                 d3.axisLeft(y)
                     .tickValues(yTicks)
+                    .tickFormat(d => `${d}%`)
                     .tickSize(0)
             )
             .call(g => g.select('.domain').remove())

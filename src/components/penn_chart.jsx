@@ -54,6 +54,7 @@ export default function PennChart({ data, width = 750, height = 400,  margin = {
             .call(
                 d3.axisLeft(y)
                     .tickValues(yTicks)
+                    .tickFormat(d => `${d}%`)
                     .tickSize(0)
             )
             .call(g => g.select('.domain').remove())
