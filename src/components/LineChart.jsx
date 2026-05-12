@@ -193,7 +193,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         const ivyNames = ["Dartmouth", "Harvard", "Columbia, Yale", "Cornell, Princeton", "Brown, UPenn", "Duke", "Stanford", "MIT"];
         const ivyTexts = ivyNames.map((name, i) => {
             return svg.append('text')
-                .attr('x', width - margin.right + 5)
+                .attr('x', width - margin.right - 5)
                 .attr('y', ivyYs[i])
                 .attr('text-anchor', 'start')
                 .attr('fill', '#1e1e1e')
@@ -204,8 +204,8 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         });
 
         const uchicagoText = svg.append('text')
-            .attr('x', width - margin.right + 5)
-            .attr('y', 65)
+            .attr('x', width - margin.right - 100)
+            .attr('y', 55)
             .attr('text-anchor', 'start')
             .attr('fill', '#800000')
             .attr('font-size', 17)

@@ -110,7 +110,7 @@ export default function OutcomesChart({ data, width = 725, height = 400,  margin
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('UChicago Students Going Into Finance & Business');
+            .text('UChicago Students Entering Finance & Business');
 
         // Solid lines for each segment with 2+ points
         segments.forEach(segment => {

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-export default function SocialHumChart({ data, title, width = 500, height = 330,  margin = { top: 60, right: 80, bottom: 30, left: 50 } }) {
+export default function SocialHumChart({ data, title, showLabels = true, width = 500, height = 330,  margin = { top: 60, right: 80, bottom: 30, left: 50 } }) {
     const svgRef = useRef();
 
     useEffect(() => {
@@ -78,10 +78,10 @@ export default function SocialHumChart({ data, title, width = 500, height = 330,
 
         // Chart title
         svg.append('text')
-            .attr('x', margin.left)
-            .attr('y', margin.top - 25)
+            .attr('x', margin.left - 35)
+            .attr('y', margin.top - 15)
             .attr('fill', 'black')
-            .attr('font-size', 22)
+            .attr('font-size', 18)
             .attr('font-family', 'Georgia, serif')
             .text(title);
 
@@ -103,28 +103,31 @@ export default function SocialHumChart({ data, title, width = 500, height = 330,
             .attr('stroke-linecap', 'round')
             .attr('d', lineInstructions);
 
-        // End-of-line labels
-        const lastUchicago = uchicagoSeries[uchicagoSeries.length - 1];
-        const lastIvyplus = ivyplusSeries[ivyplusSeries.length - 1];
+       // End-of-line labels (only render if showLabels is true)
+        if (showLabels) {
+            const lastUchicago = uchicagoSeries[uchicagoSeries.length - 1];
+            const lastIvyplus = ivyplusSeries[ivyplusSeries.length - 1];
 
-        svg.append('text')
-            .attr('x', x(2018))
-            .attr('y', y(25))
-            .attr('dy', '0.35em')
-            .attr('fill', '#800')
-            .attr('font-size', 18)
-            .attr('font-family', 'Georgia, serif')
-            .text('UChicago');
+            svg.append('text')
+                .attr('x', x(lastUchicago.year))
+                .attr('y', y(lastUchicago.value))
+                .attr('dx', 6)
+                .attr('dy', '0.35em')
+                .attr('fill', '#800')
+                .attr('font-size', 16)
+                .attr('font-family', 'Georgia, serif')
+                .text('UChicago');
 
-        svg.append('text')
-            .attr('x', x(2010))
-            .attr('y', y(42))
-            .attr('dy', '0.35em')
-            .attr('fill', '#656565')
-            .attr('font-size', 18)
-            .attr('font-family', 'Georgia, serif')
-            .text('Ivy-Plus');
-
+            svg.append('text')
+                .attr('x', x(lastIvyplus.year))
+                .attr('y', y(lastIvyplus.value))
+                .attr('dx', 6)
+                .attr('dy', '0.35em')
+                .attr('fill', '#656565')
+                .attr('font-size', 16)
+                .attr('font-family', 'Georgia, serif')
+                .text('Ivy-Plus');
+        }
     }, [data]);
 
     return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;

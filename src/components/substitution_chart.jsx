@@ -105,7 +105,7 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('Substituion to Buisness Economics');
+            .text('Major Shares Change After Business Economics Is Introduced');
 
         // Mathematics line — green
         svg.append('path')

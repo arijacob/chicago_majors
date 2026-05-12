@@ -83,7 +83,7 @@ export default function AriChart({ data, width = 700, height = 400, margin = { t
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('Humanities and Social Sciences Majors Are Declining');
+            .text('Humanities and Social Sciences Majors Are Declining at UChicago');
 
         // English line — maroon
         svg.append('path')

@@ -21,14 +21,13 @@ import {
 const ArticleSection = ({ header, paragraphs }) => (
     <section className="max-w-2xl mx-auto px-4 my-12">
         {header && (
-            <h2 className="text-3xl font-bold mb-6 font-serif">
+            <h2 className="text-3xl font-light mb-6 font-serif">
                 {header}
             </h2>
         )}
         {paragraphs.map((paragraph, i) => (
             <p
-                key={i}
-                className="text-lg leading-relaxed mb-5 font-serif"
+                className="text-lg leading-relaxed mb-5 font-serif font-normal"
                 dangerouslySetInnerHTML={{ __html: paragraph }}
             />
         ))}
@@ -103,26 +102,61 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection paragraphs={section1.slice(0, 7)} />
 
             {/* Penn comparison chart (mentioned at end of section 1) */}
-            <div className="flex justify-center my-16">
+           <figure className="my-16 flex flex-col items-center">
                 <Penn />
-            </div>
+                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+                    The economics major at the University of Chicago used to be half the size of the combination of economics, business, and finance at the University of Pennsylvania. Now, they are on equal footing.
+                </figcaption>
+            </figure>
 
-             <ArticleSection paragraphs={section1.slice(7)} />
+             <ArticleSection paragraphs={section1.slice(7, 12)} />
+
+             <figure className="my-16 flex flex-col items-start max-w-2xl mx-auto">
+                <img
+                    src="photos/ruby_photo.jpg"
+                    alt="Vincent Li"
+                    className="w-full h-auto"
+                />
+                <figcaption className="text-sm text-gray-600 italic mt-4 px-4">
+                    Ruby Velez, a fourth-year Human Rights major, says that students are thinking: "How do we leverage our education to be the most useful?" <em>Photo by Olin Nafziger.</em>
+                </figcaption>
+            </figure>
+
+             <ArticleSection paragraphs={section1.slice(12)} />
 
             {/* Section 2: fiefdom in Saieh */}
-            <ArticleSection  paragraphs={section2.slice(0,9)} />
+            <ArticleSection  paragraphs={section2.slice(0,6)} />
+
+            <figure className="my-16 flex flex-col items-start max-w-2xl mx-auto">
+                <img
+                    src="photos/vincent_photo.jpg"
+                    alt="Vincent Li"
+                    className="w-full h-auto"
+                />
+                <figcaption className="text-sm text-gray-600 italic mt-4 px-4">
+                    Vincent Li, a fourth-year buisness economics and LLSO major, said that if he didn't have an "irrational fear" of it, he might have done standard-track economics. <em>Photo by Olin Nafziger.</em>
+                </figcaption>
+            </figure>
+
+            <ArticleSection  paragraphs={section2.slice(6,9)} />
 
             {/* Substitution chart (math vs public policy) */}
-            <div className="flex justify-center my-16">
+            <figure className="my-16 flex flex-col items-center">
                 <Substitution />
-            </div>
+                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+                    The share of students majoring in mathematics and statistics, as well as those majoring in public policy has decreased precipitously since 2018. This comes after these majors were steadily growing for the previous 15 years. 
+                </figcaption>
+            </figure>
 
             <ArticleSection paragraphs={section2.slice(9, 17)} />
 
             {/* Outcomes chart (finance/business) */}
-            <div className="flex justify-center my-16">
+            <figure className="my-16 flex flex-col items-center">
                 <Outcomes />
-            </div>
+                <figcaption className="text-sm text-gray-600 italic mt-8 max-w-xl text-left px-1">
+                    After growing in the early 2010s, the share of students employed in finance or business related jobs after graduating the University of Chicago has not changed since 2017. The number of students majoring in economics nearly doubled during this time. 
+                </figcaption>
+            </figure>
 
             <ArticleSection paragraphs={section2.slice(17)} />
 
@@ -133,16 +167,22 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection paragraphs={section4.slice(0,2)} />
 
             {/* English/PoliSci chart */}
-            <div className="flex justify-center my-16">
+            <figure className="my-16 flex flex-col items-center">
                 <AriChartDemo />
-            </div>
+                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+                    In 2005, English and Political Science accounted for 20 percent of graduating students. Today, they make up just over 7 percent of the graduating class. Their decline began around 2012, the year that students entering college during the Great Recession would have graduated. 
+                </figcaption>
+            </figure>
 
             <ArticleSection paragraphs={section4.slice(2, 8)} />
 
             {/* Share of students vs share of degrees chart */}
-            <div className="flex justify-center my-16">
+            <figure className="my-16 flex flex-col items-center">
                 <SocialSciencesHumanities />
-            </div>
+                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+                     Using the share of students, humanities, social sciences, and arts majors at the University of Chicago have declined at the same rate as peer institutions. When looking at the share of degrees, Chicago is declining more quickly, particularly over the past six years.  
+                </figcaption>
+            </figure>
 
             <ArticleSection paragraphs={section4.slice(8)} />
 
@@ -156,7 +196,7 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <section className="max-w-2xl mx-auto px-4 my-12 text-sm">
                 <p dangerouslySetInnerHTML={{ __html: editorsNote }} />
             </section>
-            
+
             {/* Methodology */}
             <section className="max-w-2xl mx-auto px-4 my-16 border-t pt-12">
                 <h2 className="text-3xl font-bold mb-6 font-serif">

@@ -183,7 +183,7 @@ export const IntroAnimation = (props) => {
     const ivyProgress = useTransform(scrollYProgress, [0.32, 0.46], [0, 1]);
     const ivyFadeProgress = useTransform(scrollYProgress, [0.50, 0.52], [0, 1]);
     const annotationProgress = useTransform(scrollYProgress, [0.52, 0.55], [0, 1]);
-    const annotationFade = useTransform(scrollYProgress, [0.66, 0.68], [0, 1]);
+    const annotationFade = useTransform(scrollYProgress, [0.62, 0.68], [0, 1]);
     const humProgress = useTransform(scrollYProgress, [0.68, 0.82], [0, 1]);
 
 
@@ -291,17 +291,17 @@ export const IntroAnimation = (props) => {
                     </TextStep>
                     <TextStep v={[0.32, 0.48]} scrollY={scrollYProgress}>
                         <p className="text-xl">
-                            even while at peer institutions it has barely grown.
+                            ...even though it has barely grown at peer institutions.
                         </p>
                     </TextStep>
-                    <TextStep v={[0.46, 0.66]} scrollY={scrollYProgress}>
+                    <TextStep v={[0.46, 0.62]} scrollY={scrollYProgress}>
                         <p className="text-xl">
-                            The driver of this growth? The business economics specialization. 
+                            The primary driver of this growth? Business economics. 
                         </p>
                     </TextStep>
-                    <TextStep v={[0.66, 0.92]} scrollY={scrollYProgress}>
+                    <TextStep v={[0.62, 0.92]} scrollY={scrollYProgress}>
                         <p className="text-xl">
-                            And during this same time, the humanities and arts have been in a precipitous decline. 
+                            All the while, the humanities and arts have been steadily declining. 
                         </p>
                     </TextStep>
                     <div style={{ height: '80vh' }} />
@@ -477,9 +477,14 @@ export const SocialSciencesHumanities = () => {
     }, []);
 
     return (
+       <div className="my-16">
+        <h2 className="text-2xl font-bold text-center mb-6 font-serif">
+            Humanities, Arts, and Social Science Majors at UChicago
+        </h2>
         <div className="flex justify-center gap-3">
-            <SocialHumChart data={studentsData} title="Share of Students" />
-            <SocialHumChart data={degreesData} title="Share of Degrees" />
+            <SocialHumChart data={studentsData} title="Share of Students" showLabels={true} />
+            <SocialHumChart data={degreesData} title="Share of Degrees" showLabels={true} />
         </div>
+    </div>
     );
 };
