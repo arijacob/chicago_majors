@@ -10,6 +10,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
     const labelVisibilityRef = useRef({ uchicago: false, ivy: false });
     const annotationDottedLineRef = useRef();
     const annotationLabelRef = useRef();
+    const titleRef = useRef();
 
     useEffect(() => {
         if (!data) return;
@@ -58,6 +59,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .call(
                 d3.axisLeft(y)
                     .tickValues([40, 30, 20, 10, 0])
+                    .tickFormat(d => `${d}%`)
                     .tickSize(0)
             )
             .call(g => g.select('.domain').remove())
@@ -86,14 +88,14 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         const annotationInitial = progress ? progress.annotation.get() : 0;
 
         // Chart title
-        svg.append('text')
+        titleRef.current = svg.append('text')
             .attr('x', margin.left)
-            .attr('y', margin.top - 25)
+            .attr('y', margin.top - 15)
             .attr('text-anchor', 'start')
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('% Share of Students Majoring in Economics');
+            .text('Share of Students Majoring in Economics');
 
         // Dotted vertical line at 2018 (initially hidden)
         const annotationYear = 2018;
@@ -109,8 +111,8 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('opacity', annotationInitial);
 
         annotationLabelRef.current = svg.append('text')
-            .attr('x', x(2013.8))
-            .attr('y', margin.top + 20)
+            .attr('x', x(2013.5))
+            .attr('y', margin.top + 100)
             .attr('text-anchor', 'middle')
             .attr('fill', '#666')
             .attr('font-size', 16)
@@ -211,7 +213,29 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('font-family', 'Georgia, serif')
             .text('UChicago');
 
-        textRefs.current = { uchicago: uchicagoText, ivy: ivyTexts };
+        const humLabel = svg.append('text')
+            .attr('x', x(2007))
+            .attr('y', y(35))
+            .attr('dy', '0.35em')
+            .attr('text-anchor', 'start')
+            .attr('fill', '#2d5a3f')
+            .attr('font-size', 17)
+            .attr('opacity', humInitial > 0.95 ? 1 : 0)
+            .attr('font-family', 'Georgia, serif')
+            .text('Humanities and Arts');
+
+        const econLabel = svg.append('text')
+            .attr('x', x(2018.25))
+            .attr('y', y(38))
+            .attr('dy', '0.35em')
+            .attr('text-anchor', 'start')
+            .attr('fill', '#800000')
+            .attr('font-size', 17)
+            .attr('opacity', humInitial)
+            .attr('font-family', 'Georgia, serif')
+            .text('Economics');
+
+        textRefs.current = { uchicago: uchicagoText, ivy: ivyTexts, hum: humLabel, econ: econLabel};
         labelVisibilityRef.current = {
             uchicago: uchicagoInitial > 0.1,
             ivy: ivyInitial >= 0.2
@@ -275,9 +299,41 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         }
     });
 
+    // "Business Economics introduced" annotation fade-out
+    useMotionValueEvent(progress.annotationFade, "change", v => {
+        if (annotationDottedLineRef.current) {
+            annotationDottedLineRef.current.attr('opacity', 1 - v);
+        }
+        if (annotationLabelRef.current) {
+            annotationLabelRef.current.attr('opacity', 1 - v);
+        }
+        if (textRefs.current.uchicago) {
+            textRefs.current.uchicago.attr('opacity', 1 - v);
+        }
+    });
+
     useMotionValueEvent(progress.hum, "change", v => {
+        // Draw the humanities line
         if (pathRefs.current.hum && lengthRefs.current.hum) {
             pathRefs.current.hum.attr('stroke-dashoffset', lengthRefs.current.hum * (1 - v));
+        }
+
+        // Fade in the humanities label
+        if (textRefs.current.hum) {
+            textRefs.current.hum.attr('opacity', v);
+        }
+
+        // Fade in econ label
+        if (textRefs.current.econ) {
+            textRefs.current.econ.attr('opacity', v);
+        }
+
+         // Swap the title once we cross the threshold
+        if (titleRef.current) {
+            const newTitle = v > 0.05
+                ? 'Student Majors at UChicago'
+                : 'Share of Students Majoring in Economics';
+            titleRef.current.text(newTitle);
         }
     });
 

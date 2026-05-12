@@ -154,6 +154,21 @@ export const AnimationBoxTwo = (props) => {
     );
 }
 
+const TextStep = ({ v, scrollY, children }) => {
+    const [start, end] = v;
+    const opacity = useTransform(scrollY, [start - 0.03, start, end, end + 0.03], [0, 1, 1, 0]);
+    return (
+        <div style={{ minHeight: '150vh' }} className="flex items-center">
+            <motion.div 
+                style={{ opacity, position: 'sticky', top: '50vh' }} 
+                className="px-8"
+            >
+                {children}
+            </motion.div>
+        </div>
+    );
+};
+
 export const IntroAnimation = (props) => {
 
     const [chartData, setChartData] = useState(null);
@@ -164,41 +179,20 @@ export const IntroAnimation = (props) => {
         offset: ["start end", "end start"],
     });
 
-    const uchicagoProgress = useTransform(
-        scrollYProgress,
-        [0.16, 0.3],
-        [0, 1]
-    );
+    const uchicagoProgress = useTransform(scrollYProgress, [0.12, 0.28], [0, 1]);
+    const ivyProgress = useTransform(scrollYProgress, [0.32, 0.46], [0, 1]);
+    const ivyFadeProgress = useTransform(scrollYProgress, [0.50, 0.52], [0, 1]);
+    const annotationProgress = useTransform(scrollYProgress, [0.52, 0.55], [0, 1]);
+    const annotationFade = useTransform(scrollYProgress, [0.66, 0.68], [0, 1]);
+    const humProgress = useTransform(scrollYProgress, [0.68, 0.82], [0, 1]);
 
-    const ivyProgress = useTransform(
-        scrollYProgress,
-        [0.32, 0.6],
-        [0, 1]
-    );
-
-    const ivyFadeProgress = useTransform(
-        scrollYProgress,
-        [0.68, 0.70],
-        [0, 1]
-    );
-
-    const annotationProgress = useTransform(
-        scrollYProgress,
-         [0.72, 0.78],
-          [0, 1]
-    );
-
-    const humProgress = useTransform(
-        scrollYProgress,
-        [0.8, 0.9],
-        [0, 1]
-    )
 
     const progresses = {
         uchicago: uchicagoProgress,
          ivy: ivyProgress,
           ivyFade: ivyFadeProgress,
            annotation: annotationProgress,
+           annotationFade: annotationFade,
             hum: humProgress,
         };
     console.log(uchicagoProgress.current)
@@ -225,6 +219,7 @@ export const IntroAnimation = (props) => {
                     year, 
                     total: (vals.total / vals.students) * 100
                 }))
+                .concat({ year: 2025, total: 41 })
                 .sort((a, b) => a.year - b.year);
 
             const ivyPlusByYear = d3.rollups(
@@ -284,12 +279,41 @@ export const IntroAnimation = (props) => {
     }, []);
 
     return (
-        <div ref={containerRef} style={{ height: '1000vh' }}>
-            <div className="sticky top-0 h-screen w-full flex justify-center items-center">
-                {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
+        <div ref={containerRef} style={{ height: '750vh' }}>
+            <div className="flex">
+                {/* Left: scrolling text */}
+                <div className="w-1/2 flex flex-col">
+                <div style={{ height: '50vh' }} /> 
+                    <TextStep v={[0.08, 0.30]} scrollY={scrollYProgress}>
+                        <p className="text-xl">
+                            In twenty years, the economcis major at Chicago has doubled in size...
+                        </p>
+                    </TextStep>
+                    <TextStep v={[0.32, 0.48]} scrollY={scrollYProgress}>
+                        <p className="text-xl">
+                            even while at peer institutions it has barely grown.
+                        </p>
+                    </TextStep>
+                    <TextStep v={[0.46, 0.66]} scrollY={scrollYProgress}>
+                        <p className="text-xl">
+                            The driver of this growth? The business economics specialization. 
+                        </p>
+                    </TextStep>
+                    <TextStep v={[0.66, 0.92]} scrollY={scrollYProgress}>
+                        <p className="text-xl">
+                            And during this same time, the humanities and arts have been in a precipitous decline. 
+                        </p>
+                    </TextStep>
+                    <div style={{ height: '80vh' }} />
+                </div>
+
+                {/* Right: pinned chart */}
+                <div className="w-1/2 sticky top-0 h-screen flex items-center justify-center">
+                    {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
 // Chart of english and political science

@@ -64,9 +64,9 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
     <div className="[overflow-x:clip]">
         <IntroAnimation />
         <div className="flex flex-col items-center space-y-56">
-            <AriChartDemo />
-            <Substitution />
             <Penn />
+            <Substitution />
+            <AriChartDemo />
             <Outcomes />
             <SocialSciencesHumanities />
         </div>

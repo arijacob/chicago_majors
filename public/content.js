@@ -1,13 +1,13 @@
 export const headlinesm =
   "The Decline of the Liberal Arts at Chicago";
 
-export const headlinelg = "UChicago's Changing Majors, Analyzed";
+export const headlinelg = "The Decline of the Liberal Arts at Chicago, by the Numbers";
 
 export const subhead =
-    'The <i>Maroon</i> looks at 20 years of national enrollment data.';
+    'Welcome to the era of business economics.';
 export const byline = [
     "Data and Reporting by <a href='https://chicagomaroon.com/staff_name/ari-jacob' style='color: maroon;'>Ari Jacob</a>"
-    , "Graphics and Design by <a href='https://chicagomaroon.com/staff_name/nolan-shaffer' style='color: maroon;'>Nolan Shaffer</a>"
+    , "Graphics and Design by <a href='https://chicagomaroon.com/staff_name/nolan-shaffer' style='color: maroon;'>Nolan Shaffer</a> and <a href='https://chicagomaroon.com/staff_name/ari-jacob' style='color: maroon;'>Ari Jacob</a>",
     , "April 20, 2026"
 ]
     

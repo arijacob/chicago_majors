@@ -39,6 +39,26 @@ classifications = read_xlsx("data/classifications/final_classification.xlsx") %>
     )
  ) 
 
+majors = read_xlsx("data/classifications/chicago_majors_cip_crosswalk.xlsx") %>%
+  select(1:3) %>%
+  mutate(
+    cip_code = as.character(cip_code),
+    cip_code = if_else(str_detect(cip_code, "^[0-9]\\."),
+                       paste0("0", cip_code),
+                       cip_code)
+  ) %>%
+  filter(
+    !(chicago_major %in% c(
+      "Applied Math",
+      "Environmental/Urban Studies",
+      "Computational and Applied Math",
+      "Philosophy and Allied Fields"
+    )
+    )
+  ) %>%
+  drop_na()
+
+
 data = read_csv("data/ipeds/cleaned/major_numbers.csv") %>%
   filter(instnm == "University of Chicago") %>%
   left_join(classifications, by = c("cipcode" = "cip_code")) %>%
@@ -47,13 +67,19 @@ data = read_csv("data/ipeds/cleaned/major_numbers.csv") %>%
     total_students = sum(total[major_number == 1]),
     total_degrees = sum(total)
   ) %>%
-  ungroup()
+  ungroup() %>%
+  left_join(
+    majors, by = c('cipcode' = "cip_code")
+  ) %>%
+  select(
+    year, classification, total_students, total, cipcode, chicago_major, division
+  )
 
 uchicago_econ_2024 = 0.41
 
 humanities_econ = data %>%
   filter(
-    classification %in% c("Humanities and Arts", "Economics")
+    classification == "Economics" | classification == "Humanities and Arts"
   )  %>%
   group_by(year, classification) %>%
   summarise(
@@ -551,3 +577,4 @@ ggplot(fundamentals_english, aes(x = year, y = share_students, color = classific
     legend.position = c(0.8, 0.85),
     legend.text = element_text(size = 12)
   )
+
