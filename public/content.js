@@ -206,7 +206,7 @@ export const section5 = [
 export const section6Header = "With last year seeing the second largest increase in the economics major...";
 
 export const section6 = [
-    "With last year seeing the second largest increase in the economics major to date, there is no sign of its growth slowing down. To Lima, this makes sense. \"The way we teach it here, based on Gary Becker's economic approach … [makes it so] the degree is very general, very portable. You can do a lot of different things with it. I think students recognize that benefit.\"",
+    "<strong><strong>With last </strong></strong> year seeing the second largest increase in the economics major to date, there is no sign of its growth slowing down. To Lima, this makes sense. \"The way we teach it here, based on Gary Becker's economic approach … [makes it so] the degree is very general, very portable. You can do a lot of different things with it. I think students recognize that benefit.\"",
 
     "This broad applicability, according to Mitchell, is supposed to be the selling point of a liberal arts education, and of the humanities in particular. This is especially true when it is becoming increasingly difficult to predict what set of skills will be valuable. \"I especially feel sorry for students who are obsessed with calculating the future, which is always going to be uncertain, but more so now,\" said Mitchell, citing advances in AI and high <a href='https://www.newyorkfed.org/research/college-labor-market'>unemployment</a> rates among computer science majors as an example. \"I gather that a lot of students who were hedging their bets and majored in computer science were having great difficulty finding a job this year because AI can take over all those jobs.\"",
 
@@ -224,3 +224,68 @@ export const section6 = [
 
 export const editorsNote =
     "<em>Editor's Note: Elizabeth Eck previously served as an associate Arts editor for the </em>Maroon<em>.</em>";
+
+
+// =====================================================================
+//  METHODOLOGY
+// =====================================================================
+
+export const methodologyHeader = "Methodology";
+
+export const methodologyIntro = [
+    "This note describes the methodology used to analyze the data in the <em>Maroon</em> article <em>The Decline of the Liberal Arts at Chicago</em>. A <a href='#'>GitHub repository</a> contains all data and code used for the analysis."
+];
+
+export const methodologyDataHeader = "The Data";
+
+export const methodologyDataSubhead = "Where does the data come from?";
+
+export const methodologyData = [
+    "The data in this piece primarily comes from the National Center for Educational Statistics (NCES), which is an agency within the U.S. Department of Education that collects and analyzes data on U.S. education. These specific data come from the Integrated Postsecondary Education Data System (IPEDS), which combines data from multiple annual surveys from all colleges, universities, and technical and vocational institutions that participate in federal student financial aid programs. This encompasses nearly all institutions of higher education in the U.S.",
+
+    "This piece uses the survey on completions, a data set about the students who receive degrees. These data provide the number of students graduating in a given year that received a degree in a specific \"program,\" which in the case of this piece is equivalent to a specific major. These data separately count the number of primary majors and secondary majors. Unless otherwise noted, secondary and primary major numbers are combined.",
+
+    "These majors are classified according to the NCES's Classification of Instructional Programs (CIP). These are six digit codes which provide detailed information of the type of major. For example, code 45.06XX houses economics, under which the economics major at the University of Chicago is classified as 45.0603.",
+
+    "Along with the CIP codes, the piece also uses a classification from the National Academy of Arts and Sciences's Humanities Indicator project to group CIP codes into categories such as Humanities, Social Sciences, Visual and Performing Arts, etc.",
+
+    "The piece also uses University of Chicago–specific data to better understand the economics major. This includes data provided by the Department of Economics on the number of graduates in each track of the economics major from the 2018–2019 to the 2024–2025 school year. These data were provided on the condition that quantitative results were not published. Thus, the piece only contains information on relative sizes and trends, rather than specific shares or numbers. Data on the number of economics graduates in the 2024–2025 school year was obtained from the spring convocation program. The count was verified with the economics department data.",
+
+    "Class enrollment data come from the Registrar's website. Data on the number of requirements for each major in the 2005–2006 school year come from internet archives of the course catalog.",
+
+    "Data on student outcomes come from past versions of the Career Advancement website, which were accessed using the Wayback Machine. Data from 2018 to 2020 was not available and data from 2021 to 2023 was presented as an average over these three years. Additionally, the industries that are reported change throughout the past decade. For instance, due to a reclassification in 2024, students from the \"Corporate\" category, a sector that is included in other years, are missing. Despite these measurement challenges, under the most conservative assumptions, these data still show that there has not been an increase in the share of students working in finance and business industries since 2018."
+];
+
+export const methodologySampleHeader = "Sample Construction";
+
+export const methodologySampleSubhead = "What schools and which years are included in the data?";
+
+export const methodologySample = [
+    "The primary IPEDS sample used for this piece contains the Ivy-Plus institutions (Ivy League, Stanford, MIT, Duke, and Chicago). These data span the 2005–2006 school year through the 2023–2024 school year. I begin with the 2005–2006 school year because this is 20 years ago (a nice whole number) and marks the beginning of Robert Zimmer's tenure as President of the University. I end at the 2023–2024 school year because it is the most recent year of available data."
+];
+
+export const methodologyClassificationHeader = "Classification";
+
+export const methodologyClassificationSubhead = "How are majors classified as part of the humanities, arts, or social sciences?";
+
+export const methodologyClassification = [
+    "Much of the analysis in this piece considers groups of majors, rather than specific majors. For the arts and humanities grouping, I use the classification from the Humanities Indicators, which can be found in the GitHub repository. Specifically, I consider arts and humanities majors as those whose CIP codes fall under either the Humanities or the Fine &amp; Performing Arts category. Note that this grouping classifies the history major as part of arts and humanities, rather than the social sciences.",
+
+    "The Humanities Indicators's classification is not used for the social sciences, as this classification does not have a clean mapping. Instead, a manual classification was created, which can be found in the repository.",
+
+    "Note that this piece always considers economics separately from all other social sciences. In the piece, this is specified as either referring to this grouping as the \"other social sciences\" or explicitly referred to as \"social sciences, excluding economics.\""
+];
+
+export const methodologyMeasurementHeader = "Measurement";
+
+export const methodologyMeasurementSubhead = "How is the size of a major measured?";
+
+export const methodologyMeasurement = [
+    "There are two primary ways that the size of majors are measured: share of students and share of degrees. Share of students in major X is calculated as the number of students with major X divided by the number of graduating students. Share of degrees in major X is calculated as the number of degrees of major X divided by the number of total degrees. The piece primarily uses the share of students, although it sometimes uses the share of degrees.",
+
+    "When measuring a major's prevalence using the share of students, growth in other majors through double majoring does not affect the statistic. If everyone added a major in economics, but did not change any of their existing majors, the share of students would not change for any subject except economics.",
+
+    "On the other hand, since the share of degrees accounts for all degrees awarded across the University, more degrees in another subject will increase the denominator and make all other majors smaller.",
+
+    "The finance and business outcomes chart plots the share of employed students one year after graduation who have jobs in finance or business. To calculate these percentages, I used the Wayback Machine to look at the data on student outcomes from Career Advancement."
+];

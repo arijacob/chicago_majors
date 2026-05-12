@@ -8,7 +8,14 @@ import {
     section4, section4Header,
     section5, section5Header,
     section6, section6Header,
-    editorsNote
+    editorsNote,
+
+    methodologyHeader,
+    methodologyIntro,
+    methodologyDataHeader, methodologyDataSubhead, methodologyData,
+    methodologySampleHeader, methodologySampleSubhead, methodologySample,
+    methodologyClassificationHeader, methodologyClassificationSubhead, methodologyClassification,
+    methodologyMeasurementHeader, methodologyMeasurementSubhead, methodologyMeasurement
 } from '../../public/content.js';
 
 const ArticleSection = ({ header, paragraphs }) => (
@@ -148,6 +155,61 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             {/* Editor's note */}
             <section className="max-w-2xl mx-auto px-4 my-12 text-sm">
                 <p dangerouslySetInnerHTML={{ __html: editorsNote }} />
+            </section>
+            
+            {/* Methodology */}
+            <section className="max-w-2xl mx-auto px-4 my-16 border-t pt-12">
+                <h2 className="text-3xl font-bold mb-6 font-serif">
+                    {methodologyHeader}
+                </h2>
+                {methodologyIntro.map((p, i) => (
+                    <p key={i} className="text-lg leading-relaxed mb-5 font-serif"
+                    dangerouslySetInnerHTML={{ __html: p }} />
+                ))}
+
+                <h3 className="text-2xl font-bold mt-10 mb-2 font-serif">
+                    {methodologyDataHeader}
+                </h3>
+                <p className="text-base italic mb-5 text-gray-700 font-serif">
+                    {methodologyDataSubhead}
+                </p>
+                {methodologyData.map((p, i) => (
+                    <p key={i} className="text-lg leading-relaxed mb-5 font-serif"
+                    dangerouslySetInnerHTML={{ __html: p }} />
+                ))}
+
+                <h3 className="text-2xl font-bold mt-10 mb-2 font-serif">
+                    {methodologySampleHeader}
+                </h3>
+                <p className="text-base italic mb-5 text-gray-700 font-serif">
+                    {methodologySampleSubhead}
+                </p>
+                {methodologySample.map((p, i) => (
+                    <p key={i} className="text-lg leading-relaxed mb-5 font-serif"
+                    dangerouslySetInnerHTML={{ __html: p }} />
+                ))}
+
+                <h3 className="text-2xl font-bold mt-10 mb-2 font-serif">
+                    {methodologyClassificationHeader}
+                </h3>
+                <p className="text-base italic mb-5 text-gray-700 font-serif">
+                    {methodologyClassificationSubhead}
+                </p>
+                {methodologyClassification.map((p, i) => (
+                    <p key={i} className="text-lg leading-relaxed mb-5 font-serif"
+                    dangerouslySetInnerHTML={{ __html: p }} />
+                ))}
+
+                <h3 className="text-2xl font-bold mt-10 mb-2 font-serif">
+                    {methodologyMeasurementHeader}
+                </h3>
+                <p className="text-base italic mb-5 text-gray-700 font-serif">
+                    {methodologyMeasurementSubhead}
+                </p>
+                {methodologyMeasurement.map((p, i) => (
+                    <p key={i} className="text-lg leading-relaxed mb-5 font-serif"
+                    dangerouslySetInnerHTML={{ __html: p }} />
+                ))}
             </section>
         </div>
     );
