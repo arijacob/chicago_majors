@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {  ScrollContainer, IntroAnimation, AriChartDemo, Substitution, Penn, Outcomes, SocialSciencesHumanities} from "./Interactives.jsx"
+import {  ScrollContainer, IntroAnimation, AriChartDemo, Substitution, Penn, Outcomes, SocialSciencesHumanities, MajorExplorer} from "./Interactives.jsx"
 import {
     headlinelg, subhead, byline,
     section1,
@@ -160,6 +160,8 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
 
             <ArticleSection paragraphs={section2.slice(17)} />
 
+            <MajorExplorer />
+
             {/* Section 3: history of UChicago */}
             <ArticleSection paragraphs={section3} />
 
@@ -179,7 +181,7 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             {/* Share of students vs share of degrees chart */}
             <figure className="my-16 flex flex-col items-center">
                 <SocialSciencesHumanities />
-                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+                <figcaption className="text-sm text-gray-600 italic mt-0 max-w-xl text-left px-4">
                      Using the share of students, humanities, social sciences, and arts majors at the University of Chicago have declined at the same rate as peer institutions. When looking at the share of degrees, Chicago is declining more quickly, particularly over the past six years.  
                 </figcaption>
             </figure>

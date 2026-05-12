@@ -8,6 +8,7 @@ import SubstitutionChart from './substitution_chart';
 import PennChart from './penn_chart';
 import OutcomesChart from './outcomes_chart';
 import SocialHumChart from './socialhum_chart';
+import MajorChart from './major_chart';
 
 const ScrollBar = ({ scrollYProgress }) => {
     return (
@@ -488,3 +489,124 @@ export const SocialSciencesHumanities = () => {
     </div>
     );
 };
+
+
+export const MajorExplorer = () => {
+    const [allData, setAllData] = useState(null);
+    const [majorList, setMajorList] = useState([]);
+    const [query, setQuery] = useState("");
+    const [selectedMajors, setSelectedMajors] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+
+    // Load data once
+    useEffect(() => {
+        d3.csv("data/major_shares.csv", d3.autoType).then(rows => {
+            setAllData(rows);
+            const uniqueMajors = [...new Set(rows.map(d => d.major))].sort();
+            setMajorList(uniqueMajors);
+        });
+    }, []);
+
+    // Filter majors: match query AND not already selected
+    const filteredMajors = query.length > 0
+        ? majorList
+            .filter(m =>
+                m.toLowerCase().includes(query.toLowerCase()) &&
+                !selectedMajors.includes(m)
+            )
+            .slice(0, 8)
+        : [];
+
+    // Build one series per selected major
+    const chartSeries = selectedMajors.map(major => ({
+        major,
+        values: (allData || [])
+            .filter(d => d.major === major)
+            .map(d => ({ year: d.year, value: d.share_students * 100 }))
+            .sort((a, b) => a.year - b.year)
+    }));
+
+    const handleSelect = (major) => {
+        setSelectedMajors([...selectedMajors, major]);
+        setQuery("");
+        setShowDropdown(false);
+    };
+
+    const handleRemove = (major) => {
+        setSelectedMajors(selectedMajors.filter(m => m !== major));
+    };
+
+    const handleInputChange = (e) => {
+        setQuery(e.target.value);
+        setShowDropdown(true);
+    };
+
+    return (
+        <div className="my-16 flex flex-col items-center">
+
+            {/* Chips for selected majors */}
+            {selectedMajors.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-4 justify-center max-w-2xl">
+                    {selectedMajors.map((major, i) => (
+                        <span
+                            key={major}
+                            className="inline-flex items-center bg-gray-100 border border-gray-300 rounded-full px-3 py-1 text-sm font-serif"
+                            style={{ borderLeftColor: colorForIndex(i), borderLeftWidth: '4px' }}
+                        >
+                            {major}
+                            <button
+                                onClick={() => handleRemove(major)}
+                                className="ml-2 text-gray-500 hover:text-gray-900 font-bold"
+                                aria-label={`Remove ${major}`}
+                            >
+                                ×
+                            </button>
+                        </span>
+                    ))}
+                </div>
+            )}
+
+            {/* Search input + dropdown */}
+            <div className="relative w-72 mb-8">
+                <input
+                    type="text"
+                    placeholder={selectedMajors.length === 0 ? "Type a major..." : "Add another major..."}
+                    value={query}
+                    onChange={handleInputChange}
+                    onFocus={() => setShowDropdown(true)}
+                    onBlur={() => setTimeout(() => setShowDropdown(false), 150)}
+                    className="w-full border border-gray-400 rounded px-3 py-2 text-base font-serif focus:outline-none focus:border-gray-700"
+                />
+
+                {showDropdown && filteredMajors.length > 0 && (
+                    <ul className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-60 overflow-y-auto z-10">
+                        {filteredMajors.map((major) => (
+                            <li
+                                key={major}
+                                onClick={() => handleSelect(major)}
+                                className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-base font-serif"
+                            >
+                                {major}
+                            </li>
+                        ))}
+                    </ul>
+                )}
+            </div>
+
+            {/* Chart */}
+            {chartSeries.length > 0 ? (
+                <MajorChart series={chartSeries} />
+            ) : (
+                <p className="text-gray-500 italic font-serif">
+                    Select one or more majors to see the trend.
+                </p>
+            )}
+        </div>
+    );
+};
+
+// Helper: assign a color to each selected major by index
+const COLORS = ['#800', '#1e3a5f', '#2a7f3e', '#c45a00', '#5e35b1', '#00838f', '#d81b60', '#5d4037'];
+function colorForIndex(i) {
+    return COLORS[i % COLORS.length];
+}
