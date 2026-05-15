@@ -102,9 +102,11 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection paragraphs={section1.slice(0, 7)} />
 
             {/* Penn comparison chart (mentioned at end of section 1) */}
-           <figure className="my-16 flex flex-col items-center">
-                <Penn />
-                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+           <figure className="my-16 flex flex-col items-center max-w-3xl mx-auto px-8">
+                <div className="w-full">
+                    <Penn />
+                </div>
+                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left">
                     The economics major at the University of Chicago used to be half the size of the combination of economics, business, and finance at the University of Pennsylvania. Now, they are on equal footing.
                 </figcaption>
             </figure>
@@ -141,8 +143,10 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection  paragraphs={section2.slice(6,9)} />
 
             {/* Substitution chart (math vs public policy) */}
-            <figure className="my-16 flex flex-col items-center">
-                <Substitution />
+            <figure className="my-16 flex flex-col items-center max-w-3xl mx-auto px-8">
+                <div className="w-full">
+                    <Substitution />
+                </div>
                 <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
                     The share of students majoring in mathematics and statistics, as well as those majoring in public policy has decreased precipitously since 2018. This comes after these majors were steadily growing for the previous 15 years. 
                 </figcaption>
@@ -151,26 +155,56 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection paragraphs={section2.slice(9, 17)} />
 
             {/* Outcomes chart (finance/business) */}
-            <figure className="my-16 flex flex-col items-center">
-                <Outcomes />
-                <figcaption className="text-sm text-gray-600 italic mt-8 max-w-xl text-left px-1">
-                    After growing in the early 2010s, the share of students employed in finance or business related jobs after graduating the University of Chicago has not changed since 2017. The number of students majoring in economics nearly doubled during this time. 
+            <figure className="my-16 flex flex-col items-center max-w-3xl mx-auto px-4">
+                <div className="w-full">
+                    <Outcomes />
+                </div>
+                <figcaption className="text-sm text-gray-600 italic mt-16 max-w-xl text-left px-4">
+                    After growing in the early 2010s, the share of students employed in finance or business related jobs after graduating the University of Chicago has not changed since 2017. The number of students majoring in economics nearly doubled during this time. Dashed lines indicate years where no data was available.
                 </figcaption>
             </figure>
 
             <ArticleSection paragraphs={section2.slice(17)} />
 
-            <MajorExplorer />
+                <MajorExplorer />
 
             {/* Section 3: history of UChicago */}
-            <ArticleSection paragraphs={section3} />
+            <ArticleSection paragraphs={section3.slice(0, 3)} />
+
+            <figure className="my-16 flex flex-col items-start max-w-2xl mx-auto">
+                <img
+                    src="photos/old_class.jpg"
+                    alt="Old class"
+                    className="w-full h-auto"
+                />
+                <figcaption className="text-sm text-gray-600 italic mt-4 px-4">
+                      <em>Photo from Chicago Maroon Archive.</em>
+                </figcaption>
+            </figure>
+
+            <ArticleSection paragraphs={section3.slice(3, 6)} />
+
+             <figure className="my-16 flex flex-col items-start max-w-2xl mx-auto">
+                <img
+                    src="photos/students_studying.jpg"
+                    alt="Old class"
+                    className="w-full h-auto"
+                />
+                <figcaption className="text-sm text-gray-600 italic mt-4 px-4">
+                      <em>Photo from Chicago Maroon Archive.</em>
+                </figcaption>
+            </figure>
+
+            <ArticleSection paragraphs={section3.slice(6)} />
 
             {/* Section 4: Newman & humanities decline */}
             <ArticleSection paragraphs={section4.slice(0,2)} />
 
             {/* English/PoliSci chart */}
-            <figure className="my-16 flex flex-col items-center">
-                <AriChartDemo />
+            <figure className="my-16 flex flex-col items-center max-w-3xl mx-auto px-8">
+                 <div className="w-full">
+                    <AriChartDemo />
+                </div>
                 <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
                     In 2005, English and Political Science accounted for 20 percent of graduating students. Today, they make up just over 7 percent of the graduating class. Their decline began around 2012, the year that students entering college during the Great Recession would have graduated. 
                 </figcaption>
@@ -179,8 +213,10 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection paragraphs={section4.slice(2, 8)} />
 
             {/* Share of students vs share of degrees chart */}
-            <figure className="my-16 flex flex-col items-center">
-                <SocialSciencesHumanities />
+            <figure className="my-4 flex flex-col items-center max-w-6xl mx-auto px-8">
+                <div className="w-full">
+                    <SocialSciencesHumanities />
+                </div>
                 <figcaption className="text-sm text-gray-600 italic mt-0 max-w-xl text-left px-4">
                      Using the share of students, humanities, social sciences, and arts majors at the University of Chicago have declined at the same rate as peer institutions. When looking at the share of degrees, Chicago is declining more quickly, particularly over the past six years.  
                 </figcaption>
@@ -189,7 +225,33 @@ export default function ArticleContent({ windowHeight, windowWidth }) {
             <ArticleSection paragraphs={section4.slice(8)} />
 
             {/* Section 5: humanities response */}
-            <ArticleSection paragraphs={section5} />
+            <ArticleSection paragraphs={section5.slice(0, 4)} />
+
+            <figure className="my-8 flex flex-col items-start max-w-2xl mx-auto">
+                <img
+                    src="photos/poster_image.jpg"
+                    alt="Poster"
+                    className="w-full h-auto"
+                />
+                <figcaption className="text-sm text-gray-600 italic mt-4 px-4">
+                    Classes in the humanities, arts, and social sciences frequently advertise themselves with poster displayed around campus. <em>Photo by Olin Nafziger.</em>
+                </figcaption>
+            </figure>
+
+            <ArticleSection paragraphs={section5.slice(4, 12)} />
+
+            <figure className="my-8 flex flex-col items-start max-w-2xl mx-auto">
+                <img
+                    src="photos/classroom_image.jpg"
+                    alt="Vincent Li"
+                    className="w-full h-auto"
+                />
+                <figcaption className="text-sm text-gray-600 italic mt-4 px-4">
+                    Since 2005, the share of students majoring in the humanities, arts, or social sciences has been declining.  <em>Photo by Olin Nafziger.</em>
+                </figcaption>
+            </figure>
+
+            <ArticleSection paragraphs={section5.slice(12)} />
 
             {/* Section 6: conclusion */}
             <ArticleSection paragraphs={section6} />

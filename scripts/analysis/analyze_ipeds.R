@@ -331,28 +331,25 @@ wharton_uchicago = data %>%
     year = year - 1
   )
   
-ggplot(wharton_uchicago, aes(x = year, y = share_students, color = instnm, shape = instnm)) +
+ggplot(wharton_uchicago, aes(x = year, y = share_students, shape = instnm, linetype = instnm)) +
   geom_vline(xintercept = 2018, linetype = "dashed", color = "grey") +
-  annotate("text", x = 2010.25, y = 0.425, label = "Business Economics created",
-           hjust = 0, vjust = -0.5, size = 4, family = "Georgia") +
+  annotate("text", x = 2010.25, y = 0.4, label = "Business Economics created",
+           hjust = 0, vjust = -0.5, size = 5, family = "Georgia") +
   geom_point() +
   geom_line() +
-  scale_color_brewer(palette = "Set2") +
   labs(
     x = NULL,
     y = "Share of students",
-    title  = "Business and economics majors",
-    color = NULL,
+    title = "Business, Finance, and Economics Majors at UChicago and UPenn",
+    linetype = NULL,
     shape = NULL
   ) +
-  scale_color_manual(
-    values = c("University of Chicago" = "#800000",
-                                "University of Pennsylvania" = "#011F5B")
-  ) +
   scale_x_continuous(breaks = seq(2005, 2024, 3)) +
-  ylim(0.15, 0.45) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1)) +
   theme_custom() +
   theme(legend.position = c(0.3, 0.5),
-        legend.text = element_text(size = 10))
-ggsave("output/ivyplus/per_student/wharton_uchicago.png", width = 7.5, height = 4)
+        legend.text = element_text(size = 12),
+        title = element_text(size = 14)
+        )
+ggsave("output/ivyplus/per_student/wharton_uchicago.png", width = 9, height = 5)
 write_csv(wharton_uchicago, "output/ivyplus/per_student/wharton_uchicago.csv")

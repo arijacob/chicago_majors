@@ -83,7 +83,7 @@ export default function PennChart({ data, width = 750, height = 400,  margin = {
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('Share of Students with Buisness, Economics, or Finance Majors');
+            .text('Share of Students with Business, Economics, or Finance Majors');
 
         // UChicago line — green
         svg.append('path')
@@ -127,5 +127,13 @@ export default function PennChart({ data, width = 750, height = 400,  margin = {
 
     }, [data]);
 
-    return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+    return (
+        <svg
+            ref={svgRef}
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ width: '100%', height: 'auto', display: 'block',overflow: 'visible' }}
+        />
+    );
+
 };

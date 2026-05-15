@@ -159,10 +159,10 @@ const TextStep = ({ v, scrollY, children }) => {
     const [start, end] = v;
     const opacity = useTransform(scrollY, [start - 0.03, start, end, end + 0.03], [0, 1, 1, 0]);
     return (
-        <div style={{ minHeight: '150vh' }} className="flex items-center">
-            <motion.div 
-                style={{ opacity, position: 'sticky', top: '50vh' }} 
-                className="px-8"
+        <div className="min-h-[150vh] flex items-center">
+            <motion.div
+                style={{ opacity }}
+                className="sticky top-[75vh] lg:top-[50vh] px-6 lg:px-8"
             >
                 {children}
             </motion.div>
@@ -278,39 +278,40 @@ export const IntroAnimation = (props) => {
         });
 
     }, []);
-
+    
     return (
         <div ref={containerRef} style={{ height: '750vh' }}>
-            <div className="flex">
-                {/* Left: scrolling text */}
-                <div className="w-1/2 flex flex-col">
-                <div style={{ height: '50vh' }} /> 
+            <div className="flex flex-col lg:flex-row">
+
+                {/* Chart: stuck at top on mobile, side-pinned on desktop */}
+                <div className="order-first lg:order-last w-full lg:w-1/2 sticky top-0 h-[55vh] lg:h-screen flex items-center justify-center bg-white z-10">
+                    {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
+                </div>
+
+                {/* Text: below chart on mobile, left side on desktop */}
+                <div className="order-last lg:order-first w-full lg:w-1/2 flex flex-col">
+                    <div className="h-[10vh] lg:h-[50vh]" />
                     <TextStep v={[0.08, 0.30]} scrollY={scrollYProgress}>
-                        <p className="text-xl">
-                            In twenty years, the economcis major at Chicago has doubled in size...
+                        <p className="text-lg lg:text-xl">
+                            In twenty years, the economics major at Chicago has doubled in size...
                         </p>
                     </TextStep>
                     <TextStep v={[0.32, 0.48]} scrollY={scrollYProgress}>
-                        <p className="text-xl">
+                        <p className="text-lg lg:text-xl">
                             ...even though it has barely grown at peer institutions.
                         </p>
                     </TextStep>
                     <TextStep v={[0.46, 0.62]} scrollY={scrollYProgress}>
-                        <p className="text-xl">
-                            The primary driver of this growth? Business economics. 
+                        <p className="text-lg lg:text-xl">
+                            The primary driver of this growth? Business economics.
                         </p>
                     </TextStep>
                     <TextStep v={[0.62, 0.92]} scrollY={scrollYProgress}>
-                        <p className="text-xl">
-                            All the while, the humanities and arts have been steadily declining. 
+                        <p className="text-lg lg:text-xl">
+                            All the while, the humanities and arts have been steadily declining.
                         </p>
                     </TextStep>
-                    <div style={{ height: '80vh' }} />
-                </div>
-
-                {/* Right: pinned chart */}
-                <div className="w-1/2 sticky top-0 h-screen flex items-center justify-center">
-                    {chartData && <LineChart data={chartData} xKey="year" yKey="total" progress={progresses} />}
+                    <div className="h-[80vh]" />
                 </div>
             </div>
         </div>
@@ -477,16 +478,16 @@ export const SocialSciencesHumanities = () => {
         });
     }, []);
 
-    return (
-       <div className="my-16">
-        <h2 className="text-2xl font-bold text-center mb-6 font-serif">
-            Humanities, Arts, and Social Science Majors at UChicago
-        </h2>
-        <div className="flex justify-center gap-3">
-            <SocialHumChart data={studentsData} title="Share of Students" showLabels={true} />
-            <SocialHumChart data={degreesData} title="Share of Degrees" showLabels={true} />
+   return (
+        <div className="my-16">
+            <h2 className="text-2xl font-bold text-center mb-6 font-serif">
+                Humanities, Arts, and Social Science Majors at UChicago
+            </h2>
+            <div className="flex flex-col lg:flex-row justify-center items-center gap-6 lg:gap-3">
+                <SocialHumChart data={studentsData} title="Share of Students" showLabels={true} />
+                <SocialHumChart data={degreesData} title="Share of Degrees" showLabels={true} />
+            </div>
         </div>
-    </div>
     );
 };
 
@@ -542,7 +543,7 @@ export const MajorExplorer = () => {
     };
 
     return (
-        <div className="my-16 flex flex-col items-center">
+        <div className="my-16 flex flex-col items-center max-w-3xl mx-auto px-4">
 
             {/* Chips for selected majors */}
             {selectedMajors.length > 0 && (
@@ -594,13 +595,18 @@ export const MajorExplorer = () => {
             </div>
 
             {/* Chart */}
-            {chartSeries.length > 0 ? (
+           {chartSeries.length > 0 ? (
+            <figure className="w-full flex flex-col items-center">
                 <MajorChart series={chartSeries} />
-            ) : (
-                <p className="text-gray-500 italic font-serif">
-                    Select one or more majors to see the trend.
-                </p>
-            )}
+                <figcaption className="text-sm text-gray-600 italic mt-4 max-w-xl text-left px-4">
+                    Share of UChicago graduates majoring in each selected field, 2005–2024. Use the search above to add or remove majors. UChicago-specific majors, such as LLSO, are classified from CIP codes based on best available match.
+                </figcaption>
+            </figure>
+        ) : (
+            <p className="text-gray-500 italic font-serif">
+                Select one or more majors to see the trend.
+            </p>
+        )}
         </div>
     );
 };

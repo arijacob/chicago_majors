@@ -102,6 +102,7 @@ export default function AriChart({ data, width = 700, height = 400, margin = { t
             .attr('stroke-width', 2)
             .attr('stroke-linecap', 'round')
             .attr('d', lineInstructions);
+        
 
         // End-of-line labels
         const lastEnglish = englishSeries[englishSeries.length - 1];
@@ -127,5 +128,14 @@ export default function AriChart({ data, width = 700, height = 400, margin = { t
 
     }, [data]);
 
-    return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+    return (
+        <svg
+            ref={svgRef}
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
+        />
+    );
+    // return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+
 };

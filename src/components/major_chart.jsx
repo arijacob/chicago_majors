@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 
 const COLORS = ['#800', '#1e3a5f', '#2a7f3e', '#c45a00', '#5e35b1', '#00838f', '#d81b60', '#5d4037'];
 
-export default function MajorChart({ series, width = 700, height = 400, margin = { top: 60, right: 140, bottom: 30, left: 50 } }) {
+export default function MajorChart({ series, width = 700, height = 400, margin = { top: 60, right: 50, bottom: 30, left: 50 } }) {
     const svgRef = useRef();
 
     useEffect(() => {
@@ -87,7 +87,7 @@ export default function MajorChart({ series, width = 700, height = 400, margin =
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('Share of UChicago Students');
+            .text('Share of UChicago Majors');
 
         // Draw one line per series
         series.forEach((s, i) => {
@@ -118,5 +118,13 @@ export default function MajorChart({ series, width = 700, height = 400, margin =
 
     }, [series]);
 
-    return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+    return (
+        <svg
+            ref={svgRef}
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ width: '100%', height: 'auto', display: 'block', overflow: 'visible' }}
+        />
+    );
+    // return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
 }

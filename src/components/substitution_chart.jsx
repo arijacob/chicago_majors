@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import * as d3 from 'd3';
 
-export default function SubstitutionChart({ data, width = 700, height = 400, margin = { top: 60, right: 80, bottom: 30, left: 50 } }) {
+export default function SubstitutionChart({ data, width = 700, height = 400, margin = { top: 60, right: 50, bottom: 30, left: 50 } }) {
     const svgRef = useRef();
 
     useEffect(() => {
@@ -90,11 +90,11 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
 
         // Label above the line
         svg.append('text')
-            .attr('x', x(2014.7))
-            .attr('y', margin.top + 20)
+            .attr('x', x(2014.25))
+            .attr('y', margin.top + 18)
             .attr('text-anchor', 'middle')
             .attr('fill', '#666')
-            .attr('font-size', 13)
+            .attr('font-size', 16)
             .attr('font-family', 'Georgia, serif')
             .text('Business Economics introduced');
 
@@ -105,7 +105,7 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
             .attr('fill', 'black')
             .attr('font-size', 22)
             .attr('font-family', 'Georgia, serif')
-            .text('Major Shares Change After Business Economics Is Introduced');
+            .text('Major Shares Changed After Business Economics Was Introduced');
 
         // Mathematics line — green
         svg.append('path')
@@ -130,8 +130,8 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
         const lastPubPol = publicPolicySeries[publicPolicySeries.length - 1];
 
         svg.append('text')
-            .attr('x', width - margin.right + 5)
-            .attr('y', y(lastMath.value))
+            .attr('x', x(2020.25))
+            .attr('y', y(lastMath.value + 3.2))
             .attr('dy', '0.35em')
             .attr('fill', '#2a7f3e')
             .attr('font-size', 15)
@@ -139,8 +139,8 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
             .text('Math and Statistics');
 
         svg.append('text')
-            .attr('x', width - margin.right + 5)
-            .attr('y', y(lastPubPol.value))
+            .attr('x', x(2021.5))
+            .attr('y', y(lastPubPol.value + 2.15))
             .attr('dy', '0.35em')
             .attr('fill', '#c45a00')
             .attr('font-size', 15)
@@ -149,5 +149,15 @@ export default function SubstitutionChart({ data, width = 700, height = 400, mar
 
     }, [data]);
 
-    return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+    // return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+
+    return (
+        <svg
+            ref={svgRef}
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ width: '100%', height: 'auto', display: 'block' }}
+        />
+    );
+
 }

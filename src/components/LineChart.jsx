@@ -2,7 +2,24 @@ import React, { useRef, useEffect } from 'react';
 import { useMotionValueEvent } from 'motion/react';
 import * as d3 from 'd3';
 
-export default function LineChart({ data, xKey, yKey, progress, width = 600, height = 400, margin = { top: 20, right: 60, bottom: 30, left: 0 } }) {
+const ivyAbbreviations = {
+    "Massachusetts Institute of Technology": "MIT",
+    "University of Pennsylvania": "Penn",
+    "Princeton University": "Princeton",
+    "Stanford University": "Stanford",
+    "Harvard University": "Harvard",
+    "Yale University": "Yale",
+    "Columbia University in the City of New York": "Columbia",
+    "Cornell University": "Cornell",
+    "Brown University": "Brown",
+    "Dartmouth College": "Dartmouth",
+    "Duke University": "Duke",
+};
+
+// Helper to get the display name (fall back to original if no abbreviation)
+const abbreviate = (name) => ivyAbbreviations[name] ?? name;
+
+export default function LineChart({ data, xKey, yKey, progress, width = 600, height = 400, margin = { top: 20, right: 120, bottom: 30, left: 20 } }) {
     const svgRef = useRef();
     const pathRefs = useRef({ uchicago: null, uchicagoInner: null, ivy: [], hum: null });
     const lengthRefs = useRef({ uchicago: 0, ivy: [], hum: 0});
@@ -111,7 +128,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('opacity', annotationInitial);
 
         annotationLabelRef.current = svg.append('text')
-            .attr('x', x(2013.5))
+            .attr('x', x(2012.85))
             .attr('y', margin.top + 100)
             .attr('text-anchor', 'middle')
             .attr('fill', '#666')
@@ -128,7 +145,7 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
             .attr('fill', 'none')
             .attr('class', 'ivy-plus-line')
             .attr('stroke', '#1e1e1e')
-            .attr('stroke-linecap', 'round')
+            .attr('stroke-linecap', 'butt')
             .attr('stroke-width', 1.2)
             .attr('opacity', 0.3)
             .attr('d', d => lineInstructions(d.values));
@@ -188,19 +205,60 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
                 .attr('stroke-dashoffset', length * (1 - ivyInitial));
         });
 
+
+        // Compute each ivy series' final endpoint
+        const ivyEndpoints = ivySeries.map(d => {
+            const lastPoint = d.values[d.values.length - 1];
+            return {
+                instnm: d.instnm,
+                x: x(lastPoint[xKey]) + 5,  // starting x just past line endpoint
+                y: y(lastPoint[yKey])
+            };
+        });
+
+        // Sort top-to-bottom
+        ivyEndpoints.sort((a, b) => a.y - b.y);
+
+        // Adjust positions: if two labels are too close vertically,
+        // push the next one to the right instead of down
+       const minVerticalSpacing = 14;
+        const horizontalOffsetPerCollision = 55;
+        const maxHorizontalShift = 60; // never go more than 60px right of original x
+
+        for (let i = 1; i < ivyEndpoints.length; i++) {
+            const curr = ivyEndpoints[i];
+            const originalX = curr.x;
+
+            for (let j = 0; j < i; j++) {
+                const prev = ivyEndpoints[j];
+                const verticalOverlap = Math.abs(curr.y - prev.y) < minVerticalSpacing;
+                const horizontalOverlap = Math.abs(curr.x - prev.x) < horizontalOffsetPerCollision;
+
+                if (verticalOverlap && horizontalOverlap) {
+                    // Try shifting right first
+                    const tryShift = prev.x + horizontalOffsetPerCollision;
+                    if (tryShift - originalX <= maxHorizontalShift) {
+                        curr.x = tryShift;
+                    } else {
+                        // Can't go further right — push down instead
+                        curr.x = originalX;
+                        curr.y = prev.y + minVerticalSpacing;
+                    }
+                }
+            }
+        }
         // School name labels (right side)
-        const ivyYs = [208, 222, 236, 251, 265, 280, 297, 314];
-        const ivyNames = ["Dartmouth", "Harvard", "Columbia, Yale", "Cornell, Princeton", "Brown, UPenn", "Duke", "Stanford", "MIT"];
-        const ivyTexts = ivyNames.map((name, i) => {
+        const ivyTexts = ivyEndpoints.map(endpoint => {
             return svg.append('text')
-                .attr('x', width - margin.right - 5)
-                .attr('y', ivyYs[i])
+                .attr('x', endpoint.x)              // ← was endpoint.x + 5 (double offset)
+                .attr('y', endpoint.y) 
+                .attr('dy', '0.35em')
                 .attr('text-anchor', 'start')
                 .attr('fill', '#1e1e1e')
                 .attr('font-size', 12)
                 .attr('opacity', ivyInitial >= 0.2 ? 0.6 : 0)
                 .attr('font-family', 'Georgia, serif')
-                .text(name);
+                .text(abbreviate(endpoint.instnm));
         });
 
         const uchicagoText = svg.append('text')
@@ -337,5 +395,12 @@ export default function LineChart({ data, xKey, yKey, progress, width = 600, hei
         }
     });
 
-    return <svg ref={svgRef} width={width} height={height} style={{ overflow: 'visible' }} />;
+    return (
+        <svg
+            ref={svgRef}
+            viewBox={`0 0 ${width} ${height}`}
+            preserveAspectRatio="xMidYMid meet"
+            style={{ width: '90%', height: 'auto', maxWidth: width, overflow: 'visible' }}
+        />
+    );
 };

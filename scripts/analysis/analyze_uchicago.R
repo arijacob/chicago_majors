@@ -93,19 +93,29 @@ humanities_econ = data %>%
     )
   )
 
-ggplot(humanities_econ, aes(x = year, y = share_students, color = classification, shape = classification)) +
+ggplot(humanities_econ, aes(
+  x = year,
+  y = share_students,
+  shape = classification,
+  linetype = classification
+  )
+  ) +
   geom_line() +
   geom_point() +
-  scale_color_manual(values = c("Economics" = "#0076bd", "Humanities and Arts" = "#7bb14e")) +
   labs(
     x = NULL,
     y = "Share of students",
+    title = "Student Majors at UChicago",
     color = NULL,
-    shape = NULL) +
+    shape = NULL,
+    linetype = NULL
+    ) +
   theme_custom() +
-  ylim(0.1, 0.45) +
+  scale_y_continuous(labels = scales::percent_format(accuracy = 1), 
+                     limits = c(0.15, .45)
+                     ) +
   theme(
-    legend.position = c(0.3, 0.72),
+    legend.position = c(0.3, 0.8),
     legend.text = element_text(size = 16)
   )
 ggsave("output/uchicago/per_student/economics_humanities.png", width = 8, height = 5)
